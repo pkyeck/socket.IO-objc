@@ -71,6 +71,7 @@
 - (void) sendJSON:(NSDictionary *)data withAcknowledge:(SEL)function;
 - (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data;
 - (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SEL)function;
+- (void) sendAcknowledgement:(NSString*)pId withArgs:(NSArray *)data;
 
 @end
 
@@ -83,6 +84,7 @@
     NSString *name;
     NSString *data;
     NSArray *args;
+    NSString *endpoint;
     
     @private
     NSArray *_types;
@@ -93,6 +95,7 @@
 @property (nonatomic, copy) NSString *ack;
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, copy) NSString *data;
+@property (nonatomic, copy) NSString *endpoint;
 @property (nonatomic, copy) NSArray *args;
 
 - (id) initWithType:(NSString *)packetType;
