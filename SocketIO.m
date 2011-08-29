@@ -212,10 +212,10 @@
         NSString *ackpId = @"";
         // This is an acknowledgement packet, so, prepend the ack pid to the data
         if ([type intValue] == 6) {
-            ackpId = [NSString stringWithFormat:@"%@%@", packet.pId, @"+"];
+            ackpId = [NSString stringWithFormat:@":%@%@", packet.pId, @"+"];
         }
         
-        [encoded addObject:[NSString stringWithFormat:@":%@%@", ackpId, packet.data]];
+        [encoded addObject:[NSString stringWithFormat:@"%@%@", ackpId, packet.data]];
     }
     
     NSString *req = [encoded componentsJoinedByString:@":"];
