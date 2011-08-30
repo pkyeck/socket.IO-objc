@@ -146,6 +146,15 @@
     [packet release];
 }
 
+- (void)sendAcknowledgement:(NSString *)pId withArgs:(NSArray *)data {
+    SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"ack"];
+    packet.data = [data JSONRepresentation];
+    packet.pId = pId;
+    packet.ack = @"data";
+
+    [self send:packet];
+    [packet release];
+}
 
 # pragma mark -
 # pragma mark private methods
@@ -187,15 +196,26 @@
     {
         pId = [pId stringByAppendingString:@"+"];
     }
-    [encoded addObject:pId];
+    
+    // Do not write pid for acknowledgements
+    if ([type intValue] != 6) {
+        [encoded addObject:pId];
+    }
     
     // not yet sure what this is for
     NSString *endPoint = @"";
     [encoded addObject:endPoint];
     
+    
     if (packet.data != nil)
     {
-        [encoded addObject:packet.data];
+        NSString *ackpId = @"";
+        // This is an acknowledgement packet, so, prepend the ack pid to the data
+        if ([type intValue] == 6) {
+            ackpId = [NSString stringWithFormat:@":%@%@", packet.pId, @"+"];
+        }
+        
+        [encoded addObject:[NSString stringWithFormat:@"%@%@", ackpId, packet.data]];
     }
     
     NSString *req = [encoded componentsJoinedByString:@":"];
@@ -240,8 +260,8 @@
         
         packet.pId = [result objectAtIndex:2];
         
-        // 3 => ack
-        // 4 => endpoint (TODO)        
+        packet.ack = [result objectAtIndex:3];
+        packet.endpoint = [result objectAtIndex:4];        
         packet.data = [result objectAtIndex:5];
         
         //
@@ -546,7 +566,7 @@
 
 @implementation SocketIOPacket
 
-@synthesize type, pId, name, ack, data, args;
+@synthesize type, pId, name, ack, data, args, endpoint;
 
 - (id) init
 {
@@ -614,6 +634,7 @@
     [ack release];
     [data release];
     [args release];
+    [endpoint release];
     
     [super dealloc];
 }
