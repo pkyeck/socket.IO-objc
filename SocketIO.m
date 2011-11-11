@@ -131,7 +131,8 @@
 - (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SEL)function
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:eventName forKey:@"name"];
-    [dict setObject:data forKey:@"args"];
+    if (data != nil) // do not require arguments
+        [dict setObject:data forKey:@"args"];
     
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"event"];
     packet.data = [dict JSONRepresentation];
