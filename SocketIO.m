@@ -47,7 +47,7 @@
 - (void) sendHearbeat;
 - (void) send:(SocketIOPacket *)packet;
 
-- (NSString *) addAcknowledge:(SEL)function;
+- (NSString *) addAcknowledge:(SocketIOCallback)function;
 - (void) removeAcknowledgeForKey:(NSString *)key;
 
 @end
@@ -102,7 +102,7 @@
     [self sendMessage:data withAcknowledge:nil];
 }
 
-- (void) sendMessage:(NSString *)data withAcknowledge:(SEL)function
+- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"message"];
     packet.data = data;
@@ -115,7 +115,7 @@
     [self sendJSON:data withAcknowledge:nil];
 }
 
-- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SEL)function
+- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"json"];
     packet.data = [data JSONRepresentation];
@@ -128,7 +128,7 @@
     [self sendEvent:eventName withData:data andAcknowledge:nil];
 }
 
-- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SEL)function
+- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SocketIOCallback)function
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:eventName forKey:@"name"];
     if (data != nil) // do not require arguments
@@ -336,17 +336,10 @@
                     
                     // get selector for ackId
                     NSString *key = [NSString stringWithFormat:@"%d", ackId];
-                    SEL function = NSSelectorFromString([_acks objectForKey:key]);
-                    if ([_delegate respondsToSelector:function])
+                    SocketIOCallback callbackFunction = [_acks objectForKey:key];
+                    if (callbackFunction != nil)
                     {
-                        if (argsData != nil)
-                        {
-                            [_delegate performSelector:function withObject:argsData];
-                        }
-                        else
-                        {
-                            [_delegate performSelector:function];
-                        }
+                        callbackFunction(argsData);
                         [self removeAcknowledgeForKey:key];
                     }
                 }
@@ -426,13 +419,13 @@
 # pragma mark -
 # pragma mark Acknowledge methods
 
-- (NSString *) addAcknowledge:(SEL)function
+- (NSString *) addAcknowledge:(SocketIOCallback)function
 {
     if (function)
     {
         ++_ackCount;
         NSString *ac = [NSString stringWithFormat:@"%d", _ackCount];
-        [_acks setObject:NSStringFromSelector(function) forKey:ac];
+        [_acks setObject:[function copy] forKey:ac];
         return ac;
     }
     return nil;

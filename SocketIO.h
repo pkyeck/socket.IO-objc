@@ -24,6 +24,7 @@
 @class SocketIO;
 @class SocketIOPacket;
 
+typedef void(^SocketIOCallback)(id argsData);
 
 @protocol SocketIODelegate <NSObject>
 @optional
@@ -66,11 +67,11 @@
 - (void) disconnect;
 
 - (void) sendMessage:(NSString *)data;
-- (void) sendMessage:(NSString *)data withAcknowledge:(SEL)function;
+- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
 - (void) sendJSON:(NSDictionary *)data;
-- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SEL)function;
+- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function;
 - (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data;
-- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SEL)function;
+- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SocketIOCallback)function;
 - (void) sendAcknowledgement:(NSString*)pId withArgs:(NSArray *)data;
 
 @end
