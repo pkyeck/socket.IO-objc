@@ -19,11 +19,11 @@
   There are different methods to send data to the server 
 
     - (void) sendMessage:(NSString *)data;
-	- (void) sendMessage:(NSString *)data withAcknowledge:(SEL)function;
+	- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
 	- (void) sendJSON:(NSDictionary *)data;
-	- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SEL)function;
+	- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function;
 	- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data;
-	- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SEL)function;
+	- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SocketIOCallback)function;
 	
   So you could send a normal Message like this
 
@@ -37,10 +37,13 @@
 	
 	[socketIO sendEvent:@"welcome" withData:dict];
 	
-  If you want the server to acknowledge your Message/Event you would also pass a selector
+  If you want the server to acknowledge your Message/Event you would also pass a SocketIOCallback block
 	
-	SEL selc = @selector(callbackWithData:);
-	[socketIO sendEvent:@"welcomeAck" withData:dict andAcknowledge:selc];
+	SocketIOCallback cb = ^(id argsData) {
+		NSDictionary *response = argsData;
+		// do something with response
+	};
+	[socketIO sendEvent:@"welcomeAck" withData:dict andAcknowledge:cb];
 	
   All delegate methods are optional - you could implement the following
 
