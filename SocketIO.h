@@ -62,6 +62,8 @@ typedef void(^SocketIOCallback)(id argsData);
     NSInteger _ackCount;
 }
 
+@property (nonatomic, readonly) BOOL isConnected, isConnecting;
+
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port;
 - (void) disconnect;
