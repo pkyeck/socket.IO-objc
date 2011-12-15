@@ -493,6 +493,14 @@
 {
     NSError *error = [request error];
     NSLog(@"ERROR: handshake failed ... %@", [error localizedDescription]);
+    
+    _isConnected = NO;
+    _isConnecting = NO;
+    
+    if ([_delegate respondsToSelector:@selector(socketIOHandshakeFailed:)])
+    {
+        [_delegate socketIOHandshakeFailed:self];
+    }
 }
 
 # pragma mark -
