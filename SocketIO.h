@@ -44,6 +44,7 @@ typedef void(^SocketIOCallback)(id argsData);
     NSString *_host;
     NSInteger _port;
     NSString *_sid;
+    NSString *_endpoint;
     
     id<SocketIODelegate> _delegate;
     
@@ -67,6 +68,8 @@ typedef void(^SocketIOCallback)(id argsData);
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port;
+- (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params;
+- (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint;
 - (void) disconnect;
 
 - (void) sendMessage:(NSString *)data;

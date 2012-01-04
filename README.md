@@ -16,6 +16,14 @@
     SocketIO *socketIO = [[SocketIO alloc] initWithDelegate:self];
     [socketIO connectToHost:@"localhost" onPort:3000];
 
+  If required, additional parameters can be included in the handshake by adding an `NSDictionary` to the `withParams` option:
+
+    [socketIO connectToHost:@"localhost" onPort:3000 withParams:[NSDictionary dictionaryWithObjectsAndKeys:@"1234","auth_token",nil]];
+
+  A namespace can also be defined in the connection details:
+
+    [socketIO connectToHost:@"localhost" onPort:3000 withParams:nil withNamespace:@"/users"];
+
   There are different methods to send data to the server 
 
     - (void) sendMessage:(NSString *)data;
