@@ -194,6 +194,18 @@
     
 }
 
+// Tell the socket to close as soon as possible, and ignore the normal disconnect packet
+// This is useful for applications that need to go into the background ASAP.
+- (void) forceDisconnect
+{
+    if (_webSocket != nil) {
+        [_webSocket disconnect];
+        [_webSocket release];
+        _webSocket = nil;
+    }
+    [self onDisconnect];
+}
+
 - (void) sendDisconnect
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"disconnect"];
