@@ -25,7 +25,7 @@
 #import "RegexKitLite.h"
 #import "SBJson.h"
 
-#define DEBUG_LOGS 0
+#define DEBUG_LOGS 1
 #define HANDSHAKE_URL @"http://%@:%d/socket.io/1/?t=%d%@"
 #define SOCKET_URL @"ws://%@:%d/socket.io/1/websocket/%@"
 
@@ -40,7 +40,7 @@
 - (void) setTimeout;
 - (void) onTimeout;
 
-- (void) onConnect;
+- (void) onConnect:(SocketIOPacket *)packet;
 - (void) onDisconnect;
 
 - (void) sendDisconnect;
@@ -198,11 +198,7 @@
 // This is useful for applications that need to go into the background ASAP.
 - (void) forceDisconnect
 {
-    if (_webSocket != nil) {
-        [_webSocket disconnect];
-        [_webSocket release];
-        _webSocket = nil;
-    }
+    [self sendDisconnect];
     [self onDisconnect];
 }
 
@@ -321,7 +317,7 @@
                 [self log:@"connect"];
                 // from socket.io.js ... not sure when data will contain sth?! 
                 // packet.qs = data || '';
-                [self onConnect];
+                [self onConnect:packet];
                 break;
                 
             case 2:
@@ -433,17 +429,23 @@
     }
 }
 
-- (void) onConnect
+- (void) onConnect:(SocketIOPacket *)packet
 {
     [self log:@"onConnect()"];
     
     _isConnected = YES;
-    
+
     // Send the connected packet so the server knows what it's dealing with.
     // Only required when endpoint/namespace is present
-    if (_isConnecting && [_endpoint length] > 0)
-        [self sendConnect];
-
+    if ([_endpoint length] > 0) {
+        // Make sure the packet we received has an endpoint, otherwise send it again
+        if (![packet.endpoint isEqualToString:_endpoint]) {
+            [self log:@"onConnect() >> End points do not match, resending connect packet"];
+            [self sendConnect];
+            return;
+        }
+    }
+    
     _isConnecting = NO;
     
     if ([_delegate respondsToSelector:@selector(socketIODidConnect:)]) 
@@ -467,6 +469,17 @@
     _sid = nil;
     
     [_queue removeAllObjects];
+    
+    // Kill the heartbeat timer
+    if (_timeout != nil) {
+        [_timeout invalidate];
+        _timeout = nil;
+    }
+    
+    // Disconnect the websocket, just in case
+    [_webSocket disconnect];
+    [_webSocket release];
+    _webSocket = nil;    
     
     if (wasConnected && [_delegate respondsToSelector:@selector(socketIODidDisconnect:)]) 
     {
