@@ -25,7 +25,7 @@
 #import "RegexKitLite.h"
 #import "SBJson.h"
 
-#define DEBUG_LOGS 0
+#define DEBUG_LOGS 1
 #define HANDSHAKE_URL @"http://%@:%d/socket.io/1/?t=%d%@"
 #define SOCKET_URL @"ws://%@:%d/socket.io/1/websocket/%@"
 
@@ -194,14 +194,6 @@
     
 }
 
-// Tell the socket to close as soon as possible, and ignore the normal disconnect packet
-// This is useful for applications that need to go into the background ASAP.
-- (void) forceDisconnect
-{
-    [self sendDisconnect];
-    [self onDisconnect];
-}
-
 - (void) sendDisconnect
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"disconnect"];
@@ -241,8 +233,8 @@
     }
     
     // Add the end point for the namespace to be used, as long as it is not
-    // an ACK or Heartbeat packet
-    if ([type intValue] != 6 && [type intValue] != 2) {
+    // an ACK, heartbeat, or disconnect packet
+    if ([type intValue] != 6 && [type intValue] != 2 && [type intValue] != 0) {
         [encoded addObject:_endpoint];
     } else {
         [encoded addObject:@""];
@@ -477,10 +469,8 @@
     }
     
     // Disconnect the websocket, just in case
-    if (_webSocket != nil) {
+    if (_webSocket != nil && [_webSocket connected]) {
         [_webSocket close];
-        [_webSocket release];
-        _webSocket = nil;
     }
     
     if (wasConnected && [_delegate respondsToSelector:@selector(socketIODidDisconnect:)]) 

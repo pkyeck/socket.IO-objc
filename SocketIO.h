@@ -71,7 +71,6 @@ typedef void(^SocketIOCallback)(id argsData);
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint;
 - (void) disconnect;
-- (void) forceDisconnect;
 
 - (void) sendMessage:(NSString *)data;
 - (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
