@@ -477,9 +477,11 @@
     }
     
     // Disconnect the websocket, just in case
-    [_webSocket disconnect];
-    [_webSocket release];
-    _webSocket = nil;    
+    if (_webSocket != nil) {
+        [_webSocket close];
+        [_webSocket release];
+        _webSocket = nil;
+    }
     
     if (wasConnected && [_delegate respondsToSelector:@selector(socketIODidDisconnect:)]) 
     {

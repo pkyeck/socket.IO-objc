@@ -4,10 +4,13 @@
   with the help of websockets. It's based on fpotter's [socketio-cocoa](https://github.com/fpotter/socketio-cocoa) 
   and uses other libraries/classes like 
 
-   * [cocoa-websocket](https://github.com/erichocean/cocoa-websocket)
+   * [cocoa-websocket](https://github.com/samlown/cocoa-websocket)
    * [RegexKitLite](http://regexkit.sourceforge.net/RegexKitLite/)
    * [json-framework](https://github.com/stig/json-framework/)
    * [ASIHTTPRequest](http://allseeing-i.com/ASIHTTPRequest/)
+
+  There are several cocoa-websocket repos around with marginally different interfaces. This version is known to work with
+  repo suggested above with at least Draft 76 support. See repo's fork list for alternatives.
 
 ## Usage
 
@@ -74,6 +77,11 @@
   For one, Rooms are not yet supported.
   Error command handling still missing.
   ... and there may be other things I didn't think of.
+
+## Authors
+
+Initial project by Philipp Kyeck <philipp@beta-interactive.de>.
+Namespace support by Sam Lown <sam@cabify.com> at Cabify.
 
 ## License 
 
