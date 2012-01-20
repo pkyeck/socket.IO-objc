@@ -25,7 +25,7 @@
 #import "RegexKitLite.h"
 #import "SBJson.h"
 
-#define DEBUG_LOGS 1
+#define DEBUG_LOGS 0
 #define HANDSHAKE_URL @"http://%@:%d/socket.io/1/?t=%d%@"
 #define SOCKET_URL @"ws://%@:%d/socket.io/1/websocket/%@"
 
