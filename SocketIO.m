@@ -582,6 +582,8 @@
 - (void) webSocket:(WebSocket *)ws didFailWithError:(NSError *)error 
 {
     NSLog(@"ERROR: Connection failed with error ... %@", [error localizedDescription]);
+    // Assuming this resulted in a disconnect
+    [self onDisconnect];
 }
 
 - (void) webSocket:(WebSocket *)ws didReceiveMessage:(NSString*)message 
