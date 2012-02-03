@@ -513,6 +513,7 @@
     [self log:@"setTimeout()"];
     if (_timeout != nil) 
     {   
+        [[self retain] autorelease]; //Prevent self from being dealloc'd if _timeout is the only one retaining it
         [_timeout invalidate];
         [_timeout release];
         _timeout = nil;
