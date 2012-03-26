@@ -17,6 +17,12 @@
 //
 //  Created by Philipp Kyeck http://beta_interactive.de
 //
+//  Updated by Nadim for Novedia Group - Hubiquitus project[hubiquitus.com]
+//
+
+#if ! __has_feature(objc_arc)
+#warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
 
 #import "SocketIO.h"
 
@@ -25,7 +31,7 @@
 #import "RegexKitLite.h"
 #import "SBJson.h"
 
-#define DEBUG_LOGS 1
+#define DEBUG_LOGS 0
 #define HANDSHAKE_URL @"http://%@:%d/socket.io/1/?t=%d%@"
 #define SOCKET_URL @"ws://%@:%d/socket.io/1/websocket/%@"
 
@@ -91,7 +97,7 @@
     {
         _isConnecting = YES;
         
-        _host = [host retain];
+        _host = host;
         _port = port;
         _endpoint = [endpoint copy];
         
@@ -105,7 +111,7 @@
         NSString *s = [NSString stringWithFormat:HANDSHAKE_URL, _host, _port, rand(), query];
         [self log:[NSString stringWithFormat:@"Connecting to socket with URL: %@",s]];
         NSURL *url = [NSURL URLWithString:s];
-        [query release];
+        query = nil;
                 
         ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
         [request setDelegate:self];
@@ -129,7 +135,6 @@
     packet.data = data;
     packet.pId = [self addAcknowledge:function];
     [self send:packet];
-    [packet release];
 }
 
 - (void) sendJSON:(NSDictionary *)data
@@ -143,7 +148,6 @@
     packet.data = [data JSONRepresentation];
     packet.pId = [self addAcknowledge:function];
     [self send:packet];
-    [packet release];
 }
 
 - (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data
@@ -165,7 +169,6 @@
         packet.ack = @"data";
     }
     [self send:packet];
-    [packet release];
 }
 
 - (void)sendAcknowledgement:(NSString *)pId withArgs:(NSArray *)data {
@@ -175,7 +178,6 @@
     packet.ack = @"data";
 
     [self send:packet];
-    [packet release];
 }
 
 # pragma mark -
@@ -184,8 +186,7 @@
 - (void) openSocket
 {
     NSString *url = [NSString stringWithFormat:SOCKET_URL, _host, _port, _sid];
-    
-    [_webSocket release];
+
     _webSocket = nil;
     
     _webSocket = [[WebSocket alloc] initWithURLString:url delegate:self];
@@ -198,21 +199,18 @@
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"disconnect"];
     [self send:packet];
-    [packet release];
 }
 
 - (void) sendConnect
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"connect"];
     [self send:packet];
-    [packet release];
 }
 
 - (void) sendHeartbeat
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"heartbeat"];
     [self send:packet];
-    [packet release];
 }
 
 - (void) send:(SocketIOPacket *)packet
@@ -281,6 +279,7 @@
     // check if data is valid (from socket.io.js)
     NSString *regex = @"^([^:]+):([0-9]+)?(\\+)?:([^:]+)?:?(.*)?$";
     NSString *regexPieces = @"^([0-9]+)(\\+)?(.*)";
+
     NSArray *test = [data arrayOfCaptureComponentsMatchedByRegex:regex];
     
     // valid data-string arrived
@@ -301,23 +300,27 @@
         switch (idx) 
         {
             case 0:
+            {
                 [self log:@"disconnect"];
                 [self onDisconnect];
                 break;
-                
+            }
             case 1:
+            {
                 [self log:@"connect"];
                 // from socket.io.js ... not sure when data will contain sth?! 
                 // packet.qs = data || '';
                 [self onConnect:packet];
                 break;
-                
+            }
             case 2:
+            {
                 [self log:@"heartbeat"];
                 [self sendHeartbeat];
                 break;
-                
+            }
             case 3:
+            {
                 [self log:@"message"];
                 if (packet.data && ![packet.data isEqualToString:@""])
                 {
@@ -327,8 +330,9 @@
                     }
                 }
                 break;
-                
+            }
             case 4:
+            {
                 [self log:@"json"];
                 if (packet.data && ![packet.data isEqualToString:@""])
                 {
@@ -338,8 +342,9 @@
                     }
                 }
                 break;
-                
+            }
             case 5:
+            {
                 [self log:@"event"];
                 if (packet.data && ![packet.data isEqualToString:@""])
                 { 
@@ -352,8 +357,9 @@
                     }
                 }
                 break;
-                
+            }
             case 6:
+            {
                 [self log:@"ack"];
                 NSArray *pieces = [packet.data arrayOfCaptureComponentsMatchedByRegex:regexPieces];
                 
@@ -385,21 +391,25 @@
                 }
                 
                 break;
-               
+            }
             case 7:
+            {
                 [self log:@"error"];
                 break;
-                
+            }   
             case 8:
+            {
                 [self log:@"noop"];
                 break;
-                
+            }   
             default:
+            {
                 [self log:@"command not found or not yet supported"];
                 break;
+            }
         }
 
-        [packet release];
+        packet = nil;
     }
     else
     {
@@ -513,17 +523,15 @@
     [self log:@"setTimeout()"];
     if (_timeout != nil) 
     {   
-        [[self retain] autorelease]; //Prevent self from being dealloc'd if _timeout is the only one retaining it
         [_timeout invalidate];
-        [_timeout release];
         _timeout = nil;
     }
     
-    _timeout = [[NSTimer scheduledTimerWithTimeInterval:_heartbeatTimeout
+    _timeout = [NSTimer scheduledTimerWithTimeInterval:_heartbeatTimeout
                                                 target:self 
                                               selector:@selector(onTimeout) 
                                               userInfo:nil 
-                                               repeats:NO] retain];
+                                               repeats:NO];
 }
 
 
@@ -536,7 +544,7 @@
     [self log:[NSString stringWithFormat:@"requestFinished() %@", responseString]];
     NSArray *data = [responseString componentsSeparatedByString:@":"];
     
-    _sid = [[data objectAtIndex:0] retain];
+    _sid = [data objectAtIndex:0];
     [self log:[NSString stringWithFormat:@"sid: %@", _sid]];
     
     // add small buffer of 7sec (magic xD)
@@ -604,19 +612,17 @@
 
 - (void) dealloc
 {
-    [_host release];
-    [_sid release];
-    [_endpoint release];
+    _host = nil;
+    _sid = nil;
+    _endpoint = nil;
     
-    [_webSocket release];
+    _webSocket = nil;
     
     [_timeout invalidate];
-    [_timeout release];
+    _timeout = nil;
     
-    [_queue release];
-    [_acks release];
-    
-    [super dealloc];
+    _queue = nil;
+    _acks = nil;
 }
 
 
@@ -635,7 +641,7 @@
     self = [super init];
     if (self)
     {
-        _types = [[NSArray arrayWithObjects: @"disconnect", 
+        _types = [NSArray arrayWithObjects: @"disconnect", 
                   @"connect", 
                   @"heartbeat", 
                   @"message", 
@@ -644,7 +650,7 @@
                   @"ack", 
                   @"error", 
                   @"noop", 
-                  nil] retain];
+                  nil];
     }
     return self;
 }
@@ -688,17 +694,15 @@
 
 - (void)dealloc
 {
-    [_types release];
+    _types = nil;
     
-    [type release];
-    [pId release];
-    [name release];
-    [ack release];
-    [data release];
-    [args release];
-    [endpoint release];
-    
-    [super dealloc];
+    type = nil;
+    pId = nil;
+    name = nil;
+    ack = nil;
+    data = nil;
+    args = nil;
+    endpoint = nil;
 }
 
 @end
