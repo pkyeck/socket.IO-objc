@@ -28,7 +28,6 @@
 
 #import "ASIHTTPRequest.h"
 #import "WebSocket.h"
-#import "RegexKitLite.h"
 #import "SBJson.h"
 
 #define DEBUG_LOGS 0
@@ -280,7 +279,28 @@
     NSString *regex = @"^([^:]+):([0-9]+)?(\\+)?:([^:]+)?:?(.*)?$";
     NSString *regexPieces = @"^([0-9]+)(\\+)?(.*)";
 
-    NSArray *test = [data arrayOfCaptureComponentsMatchedByRegex:regex];
+    //create regex result
+    NSRegularExpression * nsregexTest = [NSRegularExpression regularExpressionWithPattern:regex options:0 error:nil];
+    NSArray * nsmatchesTest = [nsregexTest matchesInString:data options:0 range:NSMakeRange(0, [data length])];
+    NSMutableArray * test = [NSMutableArray array];
+    for (NSTextCheckingResult * nsmatchTest in nsmatchesTest) {
+        NSMutableArray * localMatch = [NSMutableArray array];
+        for (int i = 0; i < [nsmatchTest numberOfRanges]; i++) {
+            NSRange range = [nsmatchTest rangeAtIndex:i];
+            NSString * nsmatchStr = nil;
+            if (range.location != NSNotFound && NSMaxRange(range) <= [data length]) {
+                nsmatchStr = [data substringWithRange:[nsmatchTest rangeAtIndex:i]];
+            } else {
+                nsmatchStr = @"";
+            }
+            [localMatch addObject:nsmatchStr];
+        }
+        [test addObject:localMatch];
+    }
+    
+    
+    
+    //NSArray *test = [data arrayOfCaptureComponentsMatchedByRegex:regex];
     
     // valid data-string arrived
     if ([test count] > 0) 
@@ -361,7 +381,27 @@
             case 6:
             {
                 [self log:@"ack"];
-                NSArray *pieces = [packet.data arrayOfCaptureComponentsMatchedByRegex:regexPieces];
+                //create regex result
+                //create regex result
+                NSRegularExpression * nsregexPieces = [NSRegularExpression regularExpressionWithPattern:regexPieces options:0 error:nil];
+                NSArray * nsmatchesPieces = [nsregexPieces matchesInString:packet.data options:0 range:NSMakeRange(0, [packet.data length])];
+                NSMutableArray * pieces = [NSMutableArray array];
+                for (NSTextCheckingResult * nsmatchPieces in nsmatchesPieces) {
+                    NSMutableArray * localMatch = [NSMutableArray array];
+                    for (int i = 0; i < [nsmatchPieces numberOfRanges]; i++) {
+                        NSRange range = [nsmatchPieces rangeAtIndex:i];
+                        NSString * nsmatchStr = nil;
+                        if (range.location != NSNotFound && NSMaxRange(range) <= [packet.data length]) {
+                            nsmatchStr = [packet.data substringWithRange:[nsmatchPieces rangeAtIndex:i]];
+                        } else {
+                            nsmatchStr = @"";
+                        }
+                        [localMatch addObject:nsmatchStr];
+                    }
+                    [pieces addObject:localMatch];
+                }
+                
+                //NSArray *pieces = [packet.data arrayOfCaptureComponentsMatchedByRegex:regexPieces];
                 
                 if ([pieces count] > 0) 
                 {
