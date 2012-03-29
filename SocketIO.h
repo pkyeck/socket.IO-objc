@@ -40,7 +40,7 @@ typedef void(^SocketIOCallback)(id argsData);
 @end
 
 
-@interface SocketIO : NSObject 
+@interface SocketIO : NSObject <NSURLConnectionDelegate>
 {
     @private
     __strong NSString *_host;
@@ -64,6 +64,9 @@ typedef void(^SocketIOCallback)(id argsData);
     // acknowledge
     __strong NSMutableDictionary *_acks;
     NSInteger _ackCount;
+    
+    //http request
+    NSMutableData * _httpRequestData;
 }
 
 @property (nonatomic, readonly) BOOL isConnected, isConnecting;

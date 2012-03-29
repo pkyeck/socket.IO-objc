@@ -26,7 +26,6 @@
 
 #import "SocketIO.h"
 
-#import "ASIHTTPRequest.h"
 #import "WebSocket.h"
 #import "SBJson.h"
 
@@ -75,7 +74,9 @@
         _queue = [[NSMutableArray alloc] init];
         
         _ackCount = 0;
-        _acks = [[NSMutableDictionary alloc] init];
+        _acks = [[NSMutableDictionary alloc] init]; 
+        
+        _httpRequestData = [NSMutableData data];
     }
     return self;
 }
@@ -88,6 +89,15 @@
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params
 {
     [self connectToHost:host onPort:port withParams:params withNamespace:@""];
+}
+
+//convenient methode to call connection request on the main thread
+- (void) httpRequestWithRequest:(NSURLRequest*)request {
+    NSURLConnection *connection = [NSURLConnection connectionWithRequest:request delegate:self];
+    
+    if(!connection) {
+        [self connection:connection didFailWithError:nil];
+    }
 }
 
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint
@@ -112,9 +122,16 @@
         NSURL *url = [NSURL URLWithString:s];
         query = nil;
                 
-        ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
+        
+        //make a request
+        NSURLRequest *request = [NSURLRequest requestWithURL:url];
+        
+        //NSURLConnection need to be called on the main thread
+        [self performSelectorOnMainThread:@selector(httpRequestWithRequest:) withObject:request waitUntilDone:YES];
+        
+        /*ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
         [request setDelegate:self];
-        [request startAsynchronous];
+        [request startAsynchronous];*/
     }
 }
 
@@ -576,9 +593,50 @@
 
 
 # pragma mark -
-# pragma mark Handshake callbacks
+# pragma mark Handshake callbacks (NSURLConnectionDataDelegate)
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    [_httpRequestData setLength:0];
+}
 
-- (void) requestFinished:(ASIHTTPRequest *)request
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    [_httpRequestData appendData:data]; 
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    NSLog(@"ERROR: handshake failed ... %@", [error localizedDescription]);
+    
+    _isConnected = NO;
+    _isConnecting = NO;
+    
+    if ([_delegate respondsToSelector:@selector(socketIOHandshakeFailed:)])
+    {
+        [_delegate socketIOHandshakeFailed:self];
+    }
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection { 	
+ 	NSString *responseString = [[NSString alloc] initWithData:_httpRequestData encoding:NSASCIIStringEncoding];
+
+    [self log:[NSString stringWithFormat:@"requestFinished() %@", responseString]];
+    NSArray *data = [responseString componentsSeparatedByString:@":"];
+    
+    _sid = [data objectAtIndex:0];
+    [self log:[NSString stringWithFormat:@"sid: %@", _sid]];
+    
+    // add small buffer of 7sec (magic xD)
+    _heartbeatTimeout = [[data objectAtIndex:1] floatValue] + 7.0;
+    [self log:[NSString stringWithFormat:@"heartbeatTimeout: %f", _heartbeatTimeout]];
+    
+    // index 2 => connection timeout
+    
+    NSString *t = [data objectAtIndex:3];
+    NSArray *transports = [t componentsSeparatedByString:@","];
+    [self log:[NSString stringWithFormat:@"transports: %@", transports]];
+    
+    [self openSocket];
+}
+
+/*- (void) requestFinished:(ASIHTTPRequest *)request
 {
     NSString *responseString = [request responseString];
     [self log:[NSString stringWithFormat:@"requestFinished() %@", responseString]];
@@ -612,7 +670,7 @@
     {
         [_delegate socketIOHandshakeFailed:self];
     }
-}
+}*/
 
 # pragma mark -
 # pragma mark WebSocket Delegate Methods
