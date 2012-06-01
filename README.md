@@ -12,6 +12,10 @@
 
   Remember to add the `-fno-objc-arc` Compiler Flag to the GCDAsyncSocket.m because it's the only file that doesn't support ARC yet.
 
+## Non-ARC version
+
+  If you're old school - there's still the [non-ARC version](https://github.com/pkyeck/socket.IO-objc/tree/non-arc) for you.
+
 ## Usage
 
   The easiest way to connect to your Socket.IO / node.js server is
@@ -82,7 +86,7 @@ ARC implementation by [bnadim](https://github.com/bnadim) and adjusted by Philip
 
 (The MIT License)
 
-Copyright (c) 2012 Philipp Kyeck <philipp@beta-interactive.de>
+Copyright (c) 2011-12 Philipp Kyeck <philipp@beta-interactive.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
