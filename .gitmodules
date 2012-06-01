@@ -1,0 +1,6 @@
+[submodule "submodules/cocoa-websocket"]
+	path = submodules/cocoa-websocket
+	url = https://github.com/bnadim/cocoa-websocket.git
+[submodule "submodules/json-framework"]
+	path = submodules/json-framework
+	url = https://github.com/stig/json-framework.git

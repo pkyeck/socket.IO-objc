@@ -1,0 +1,30 @@
+# xcode noise
+build/*
+build
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.tmproj
+*/*.pbxuser
+*/*.mode1v3
+*/*.mode2v3
+*/*.perspectivev3
+*/*.tmproj
+Build
+Products
+xcuserdata
+xcuserdata/*
+project.xcworkspace
+project.xcworkspace/*
+*/project.xcworkspace
+*/project.xcworkspace/*
+*/xcuserdata
+DerivedData
+
+# osx noise
+.DS_Store
+profile
+
+# vim noise
+*.swp
