@@ -17,15 +17,19 @@
 //
 //  Created by Philipp Kyeck http://beta_interactive.de
 //
+//  Updated by Nadim for Novedia Group - Hubiquitus project[hubiquitus.com]
+//
+
+#if ! __has_feature(objc_arc)
+#warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
 
 #import "SocketIO.h"
 
-#import "ASIHTTPRequest.h"
 #import "WebSocket.h"
-#import "RegexKitLite.h"
 #import "SBJson.h"
 
-#define DEBUG_LOGS 1
+#define DEBUG_LOGS 0
 #define HANDSHAKE_URL @"http://%@:%d/socket.io/1/?t=%d%@"
 #define SOCKET_URL @"ws://%@:%d/socket.io/1/websocket/%@"
 
@@ -70,7 +74,9 @@
         _queue = [[NSMutableArray alloc] init];
         
         _ackCount = 0;
-        _acks = [[NSMutableDictionary alloc] init];
+        _acks = [[NSMutableDictionary alloc] init]; 
+        
+        _httpRequestData = [NSMutableData data];
     }
     return self;
 }
@@ -85,13 +91,22 @@
     [self connectToHost:host onPort:port withParams:params withNamespace:@""];
 }
 
+//convenient methode to call connection request on the main thread
+- (void) httpRequestWithRequest:(NSURLRequest*)request {
+    NSURLConnection *connection = [NSURLConnection connectionWithRequest:request delegate:self];
+    
+    if(!connection) {
+        [self connection:connection didFailWithError:nil];
+    }
+}
+
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint
 {
     if (!_isConnected && !_isConnecting) 
     {
         _isConnecting = YES;
         
-        _host = [host retain];
+        _host = host;
         _port = port;
         _endpoint = [endpoint copy];
         
@@ -105,11 +120,18 @@
         NSString *s = [NSString stringWithFormat:HANDSHAKE_URL, _host, _port, rand(), query];
         [self log:[NSString stringWithFormat:@"Connecting to socket with URL: %@",s]];
         NSURL *url = [NSURL URLWithString:s];
-        [query release];
+        query = nil;
                 
-        ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
+        
+        //make a request
+        NSURLRequest *request = [NSURLRequest requestWithURL:url];
+        
+        //NSURLConnection need to be called on the main thread
+        [self performSelectorOnMainThread:@selector(httpRequestWithRequest:) withObject:request waitUntilDone:YES];
+        
+        /*ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
         [request setDelegate:self];
-        [request startAsynchronous];
+        [request startAsynchronous];*/
     }
 }
 
@@ -129,7 +151,6 @@
     packet.data = data;
     packet.pId = [self addAcknowledge:function];
     [self send:packet];
-    [packet release];
 }
 
 - (void) sendJSON:(NSDictionary *)data
@@ -143,7 +164,6 @@
     packet.data = [data JSONRepresentation];
     packet.pId = [self addAcknowledge:function];
     [self send:packet];
-    [packet release];
 }
 
 - (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data
@@ -165,7 +185,6 @@
         packet.ack = @"data";
     }
     [self send:packet];
-    [packet release];
 }
 
 - (void)sendAcknowledgement:(NSString *)pId withArgs:(NSArray *)data {
@@ -175,7 +194,6 @@
     packet.ack = @"data";
 
     [self send:packet];
-    [packet release];
 }
 
 # pragma mark -
@@ -184,8 +202,7 @@
 - (void) openSocket
 {
     NSString *url = [NSString stringWithFormat:SOCKET_URL, _host, _port, _sid];
-    
-    [_webSocket release];
+
     _webSocket = nil;
     
     _webSocket = [[WebSocket alloc] initWithURLString:url delegate:self];
@@ -198,21 +215,18 @@
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"disconnect"];
     [self send:packet];
-    [packet release];
 }
 
 - (void) sendConnect
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"connect"];
     [self send:packet];
-    [packet release];
 }
 
 - (void) sendHeartbeat
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"heartbeat"];
     [self send:packet];
-    [packet release];
 }
 
 - (void) send:(SocketIOPacket *)packet
@@ -281,7 +295,29 @@
     // check if data is valid (from socket.io.js)
     NSString *regex = @"^([^:]+):([0-9]+)?(\\+)?:([^:]+)?:?(.*)?$";
     NSString *regexPieces = @"^([0-9]+)(\\+)?(.*)";
-    NSArray *test = [data arrayOfCaptureComponentsMatchedByRegex:regex];
+
+    //create regex result
+    NSRegularExpression * nsregexTest = [NSRegularExpression regularExpressionWithPattern:regex options:0 error:nil];
+    NSArray * nsmatchesTest = [nsregexTest matchesInString:data options:0 range:NSMakeRange(0, [data length])];
+    NSMutableArray * test = [NSMutableArray array];
+    for (NSTextCheckingResult * nsmatchTest in nsmatchesTest) {
+        NSMutableArray * localMatch = [NSMutableArray array];
+        for (int i = 0; i < [nsmatchTest numberOfRanges]; i++) {
+            NSRange range = [nsmatchTest rangeAtIndex:i];
+            NSString * nsmatchStr = nil;
+            if (range.location != NSNotFound && NSMaxRange(range) <= [data length]) {
+                nsmatchStr = [data substringWithRange:[nsmatchTest rangeAtIndex:i]];
+            } else {
+                nsmatchStr = @"";
+            }
+            [localMatch addObject:nsmatchStr];
+        }
+        [test addObject:localMatch];
+    }
+    
+    
+    
+    //NSArray *test = [data arrayOfCaptureComponentsMatchedByRegex:regex];
     
     // valid data-string arrived
     if ([test count] > 0) 
@@ -301,23 +337,27 @@
         switch (idx) 
         {
             case 0:
+            {
                 [self log:@"disconnect"];
                 [self onDisconnect];
                 break;
-                
+            }
             case 1:
+            {
                 [self log:@"connect"];
                 // from socket.io.js ... not sure when data will contain sth?! 
                 // packet.qs = data || '';
                 [self onConnect:packet];
                 break;
-                
+            }
             case 2:
+            {
                 [self log:@"heartbeat"];
                 [self sendHeartbeat];
                 break;
-                
+            }
             case 3:
+            {
                 [self log:@"message"];
                 if (packet.data && ![packet.data isEqualToString:@""])
                 {
@@ -327,8 +367,9 @@
                     }
                 }
                 break;
-                
+            }
             case 4:
+            {
                 [self log:@"json"];
                 if (packet.data && ![packet.data isEqualToString:@""])
                 {
@@ -338,8 +379,9 @@
                     }
                 }
                 break;
-                
+            }
             case 5:
+            {
                 [self log:@"event"];
                 if (packet.data && ![packet.data isEqualToString:@""])
                 { 
@@ -352,10 +394,31 @@
                     }
                 }
                 break;
-                
+            }
             case 6:
+            {
                 [self log:@"ack"];
-                NSArray *pieces = [packet.data arrayOfCaptureComponentsMatchedByRegex:regexPieces];
+                //create regex result
+                //create regex result
+                NSRegularExpression * nsregexPieces = [NSRegularExpression regularExpressionWithPattern:regexPieces options:0 error:nil];
+                NSArray * nsmatchesPieces = [nsregexPieces matchesInString:packet.data options:0 range:NSMakeRange(0, [packet.data length])];
+                NSMutableArray * pieces = [NSMutableArray array];
+                for (NSTextCheckingResult * nsmatchPieces in nsmatchesPieces) {
+                    NSMutableArray * localMatch = [NSMutableArray array];
+                    for (int i = 0; i < [nsmatchPieces numberOfRanges]; i++) {
+                        NSRange range = [nsmatchPieces rangeAtIndex:i];
+                        NSString * nsmatchStr = nil;
+                        if (range.location != NSNotFound && NSMaxRange(range) <= [packet.data length]) {
+                            nsmatchStr = [packet.data substringWithRange:[nsmatchPieces rangeAtIndex:i]];
+                        } else {
+                            nsmatchStr = @"";
+                        }
+                        [localMatch addObject:nsmatchStr];
+                    }
+                    [pieces addObject:localMatch];
+                }
+                
+                //NSArray *pieces = [packet.data arrayOfCaptureComponentsMatchedByRegex:regexPieces];
                 
                 if ([pieces count] > 0) 
                 {
@@ -385,21 +448,25 @@
                 }
                 
                 break;
-               
+            }
             case 7:
+            {
                 [self log:@"error"];
                 break;
-                
+            }   
             case 8:
+            {
                 [self log:@"noop"];
                 break;
-                
+            }   
             default:
+            {
                 [self log:@"command not found or not yet supported"];
                 break;
+            }
         }
 
-        [packet release];
+        packet = nil;
     }
     else
     {
@@ -514,30 +581,69 @@
     [self log:@"setTimeout()"];
     if (_timeout != nil) 
     {   
-        [[self retain] autorelease]; //Prevent self from being dealloc'd if _timeout is the only one retaining it
         [_timeout invalidate];
-        [_timeout release];
         _timeout = nil;
     }
     
-    _timeout = [[NSTimer scheduledTimerWithTimeInterval:_heartbeatTimeout
+    _timeout = [NSTimer scheduledTimerWithTimeInterval:_heartbeatTimeout
                                                 target:self 
                                               selector:@selector(onTimeout) 
                                               userInfo:nil 
-                                               repeats:NO] retain];
+                                               repeats:NO];
 }
 
 
 # pragma mark -
-# pragma mark Handshake callbacks
+# pragma mark Handshake callbacks (NSURLConnectionDataDelegate)
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    [_httpRequestData setLength:0];
+}
 
-- (void) requestFinished:(ASIHTTPRequest *)request
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    [_httpRequestData appendData:data]; 
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    NSLog(@"ERROR: handshake failed ... %@", [error localizedDescription]);
+    
+    _isConnected = NO;
+    _isConnecting = NO;
+    
+    if ([_delegate respondsToSelector:@selector(socketIOHandshakeFailed:)])
+    {
+        [_delegate socketIOHandshakeFailed:self];
+    }
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection { 	
+ 	NSString *responseString = [[NSString alloc] initWithData:_httpRequestData encoding:NSASCIIStringEncoding];
+
+    [self log:[NSString stringWithFormat:@"requestFinished() %@", responseString]];
+    NSArray *data = [responseString componentsSeparatedByString:@":"];
+    
+    _sid = [data objectAtIndex:0];
+    [self log:[NSString stringWithFormat:@"sid: %@", _sid]];
+    
+    // add small buffer of 7sec (magic xD)
+    _heartbeatTimeout = [[data objectAtIndex:1] floatValue] + 7.0;
+    [self log:[NSString stringWithFormat:@"heartbeatTimeout: %f", _heartbeatTimeout]];
+    
+    // index 2 => connection timeout
+    
+    NSString *t = [data objectAtIndex:3];
+    NSArray *transports = [t componentsSeparatedByString:@","];
+    [self log:[NSString stringWithFormat:@"transports: %@", transports]];
+    
+    [self openSocket];
+}
+
+/*- (void) requestFinished:(ASIHTTPRequest *)request
 {
     NSString *responseString = [request responseString];
     [self log:[NSString stringWithFormat:@"requestFinished() %@", responseString]];
     NSArray *data = [responseString componentsSeparatedByString:@":"];
     
-    _sid = [[data objectAtIndex:0] retain];
+    _sid = [data objectAtIndex:0];
     [self log:[NSString stringWithFormat:@"sid: %@", _sid]];
     
     // add small buffer of 7sec (magic xD)
@@ -565,7 +671,7 @@
     {
         [_delegate socketIOHandshakeFailed:self];
     }
-}
+}*/
 
 # pragma mark -
 # pragma mark WebSocket Delegate Methods
@@ -605,19 +711,17 @@
 
 - (void) dealloc
 {
-    [_host release];
-    [_sid release];
-    [_endpoint release];
+    _host = nil;
+    _sid = nil;
+    _endpoint = nil;
     
-    [_webSocket release];
+    _webSocket = nil;
     
     [_timeout invalidate];
-    [_timeout release];
+    _timeout = nil;
     
-    [_queue release];
-    [_acks release];
-    
-    [super dealloc];
+    _queue = nil;
+    _acks = nil;
 }
 
 
@@ -636,7 +740,7 @@
     self = [super init];
     if (self)
     {
-        _types = [[NSArray arrayWithObjects: @"disconnect", 
+        _types = [NSArray arrayWithObjects: @"disconnect", 
                   @"connect", 
                   @"heartbeat", 
                   @"message", 
@@ -645,7 +749,7 @@
                   @"ack", 
                   @"error", 
                   @"noop", 
-                  nil] retain];
+                  nil];
     }
     return self;
 }
@@ -689,17 +793,15 @@
 
 - (void)dealloc
 {
-    [_types release];
+    _types = nil;
     
-    [type release];
-    [pId release];
-    [name release];
-    [ack release];
-    [data release];
-    [args release];
-    [endpoint release];
-    
-    [super dealloc];
+    type = nil;
+    pId = nil;
+    name = nil;
+    ack = nil;
+    data = nil;
+    args = nil;
+    endpoint = nil;
 }
 
 @end

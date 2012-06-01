@@ -17,6 +17,8 @@
 //
 //  Created by Philipp Kyeck http://beta_interactive.de
 //
+//  Updated by Nadim for Novedia Group - Hubiquitus project[hubiquitus.com]
+//
 
 #import <Foundation/Foundation.h>
 
@@ -38,30 +40,33 @@ typedef void(^SocketIOCallback)(id argsData);
 @end
 
 
-@interface SocketIO : NSObject 
+@interface SocketIO : NSObject <NSURLConnectionDelegate>
 {
     @private
-    NSString *_host;
-    NSInteger _port;
-    NSString *_sid;
-    NSString *_endpoint;
+    __strong NSString *_host;
+     NSInteger _port;
+    __strong NSString *_sid;
+    __strong NSString *_endpoint;
     
-    id<SocketIODelegate> _delegate;
+    __strong id<SocketIODelegate> _delegate;
     
-    WebSocket *_webSocket;
+    __strong WebSocket *_webSocket;
     
     BOOL _isConnected;
     BOOL _isConnecting;
     
     // heartbeat
     NSTimeInterval _heartbeatTimeout;
-    NSTimer *_timeout;
+    __strong NSTimer *_timeout;
     
-    NSMutableArray *_queue;
+    __strong NSMutableArray *_queue;
     
     // acknowledge
-    NSMutableDictionary *_acks;
+    __strong NSMutableDictionary *_acks;
     NSInteger _ackCount;
+    
+    //http request
+    NSMutableData * _httpRequestData;
 }
 
 @property (nonatomic, readonly) BOOL isConnected, isConnecting;
