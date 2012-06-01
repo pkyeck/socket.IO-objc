@@ -1,23 +1,23 @@
 //
 //  SocketIO.h
-//  v.01
+//  v.02 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
 //  by Fred Potter <fpotter@pieceable.com>
 //
 //  using
-//  https://github.com/erichocean/cocoa-websocket
-//  http://regexkit.sourceforge.net/RegexKitLite/
+//  https://github.com/bnadim/cocoa-websocket
 //  https://github.com/stig/json-framework/
-//  http://allseeing-i.com/ASIHTTPRequest/
 //
 //  reusing some parts of
 //  /socket.io/socket.io.js
 //
-//  Created by Philipp Kyeck http://beta_interactive.de
+//  Created by Philipp Kyeck http://beta-interactive.de
 //
-//  Updated by Nadim for Novedia Group - Hubiquitus project[hubiquitus.com]
+//  Updated by 
+//    samlown   https://github.com/samlown
+//    bnadim    https://github.com/bnadim
 //
 
 #import <Foundation/Foundation.h>
@@ -42,27 +42,26 @@ typedef void(^SocketIOCallback)(id argsData);
 
 @interface SocketIO : NSObject <NSURLConnectionDelegate>
 {
-    @private
-    __strong NSString *_host;
-     NSInteger _port;
-    __strong NSString *_sid;
-    __strong NSString *_endpoint;
+    NSString *_host;
+    NSInteger _port;
+    NSString *_sid;
+    NSString *_endpoint;
     
-    __strong id<SocketIODelegate> _delegate;
+    id<SocketIODelegate> _delegate;
     
-    __strong WebSocket *_webSocket;
+    WebSocket *_webSocket;
     
     BOOL _isConnected;
     BOOL _isConnecting;
     
     // heartbeat
     NSTimeInterval _heartbeatTimeout;
-    __strong NSTimer *_timeout;
+    NSTimer *_timeout;
     
-    __strong NSMutableArray *_queue;
+    NSMutableArray *_queue;
     
     // acknowledge
-    __strong NSMutableDictionary *_acks;
+    NSMutableDictionary *_acks;
     NSInteger _ackCount;
     
     //http request
@@ -98,7 +97,6 @@ typedef void(^SocketIOCallback)(id argsData);
     NSArray *args;
     NSString *endpoint;
     
-    @private
     NSArray *_types;
 }
 
