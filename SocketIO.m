@@ -455,6 +455,7 @@
 {
     [self log:@"onDisconnect()"];
     BOOL wasConnected = _isConnected;
+    BOOL wasConnecting = _isConnecting;
     
     _isConnected = NO;
     _isConnecting = NO;
@@ -473,7 +474,7 @@
         [_webSocket close];
     }
     
-    if (wasConnected && [_delegate respondsToSelector:@selector(socketIODidDisconnect:)]) 
+    if ((wasConnected || wasConnecting) && [_delegate respondsToSelector:@selector(socketIODidDisconnect:)]) 
     {
         [_delegate socketIODidDisconnect:self];
     }
