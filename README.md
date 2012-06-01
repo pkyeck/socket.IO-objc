@@ -5,12 +5,13 @@
   and uses other libraries/classes like 
 
    * [cocoa-websocket](https://github.com/bnadim/cocoa-websocket) (non ARC)
+
+  Remember to add the `-fno-objc-arc` Compiler Flag to the GCDAsyncSocket.m because it's the only file that doesn't support ARC yet.
+
    * [json-framework](https://github.com/stig/json-framework/)
 
   There are several cocoa-websocket repos around with marginally different interfaces. This version is known to work with
   repo suggested above with at least Draft 76 support. See repo's fork list for alternatives.
-
-  Remember to add the `-fno-objc-arc` Compiler Flag to the GCDAsyncSocket.m because it's the only file that doesn't support ARC yet.
 
 ## Non-ARC version
 
@@ -78,9 +79,9 @@
 
 ## Authors
 
-Initial project by Philipp Kyeck <philipp@beta-interactive.de>.
-Namespace support by Sam Lown <sam@cabify.com> at Cabify.
-ARC implementation by [bnadim](https://github.com/bnadim) and adjusted by Philipp.
+Initial project by Philipp Kyeck <philipp@beta-interactive.de>.  
+Namespace support by Sam Lown <sam@cabify.com> at Cabify.  
+ARC implementation by [bnadim](https://github.com/bnadim) and myself.  
 
 ## License 
 
