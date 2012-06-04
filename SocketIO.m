@@ -70,7 +70,7 @@
         _queue = [[NSMutableArray alloc] init];
         _ackCount = 0;
         _acks = [[NSMutableDictionary alloc] init]; 
-        _httpRequestData = [NSMutableData data];
+        _httpRequestData = [[NSMutableData alloc] init];
     }
     return self;
 }
