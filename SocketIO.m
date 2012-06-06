@@ -1,6 +1,6 @@
 //
 //  SocketIO.m
-//  v.02 ARC
+//  v0.21 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -28,6 +28,7 @@
 #define DEBUG_LOGS 1
 #define HANDSHAKE_URL @"http://%@:%d/socket.io/1/?t=%d%@"
 #define SOCKET_URL @"ws://%@:%d/socket.io/1/websocket/%@"
+#define XHR_URL @"http://%@:%d/socket.io/1/xhr-polling/%@"
 
 
 # pragma mark -
@@ -69,8 +70,7 @@
         _delegate = delegate;
         _queue = [[NSMutableArray alloc] init];
         _ackCount = 0;
-        _acks = [[NSMutableDictionary alloc] init]; 
-        _httpRequestData = [NSMutableData data];
+        _acks = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -83,15 +83,6 @@
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params
 {
     [self connectToHost:host onPort:port withParams:params withNamespace:@""];
-}
-
-//convenient methode to call connection request on the main thread
-- (void) httpRequestWithRequest:(NSURLRequest*)request {
-    NSURLConnection *connection = [NSURLConnection connectionWithRequest:request delegate:self];
-    
-    if(!connection) {
-        [self connection:connection didFailWithError:nil];
-    }
 }
 
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint
@@ -117,13 +108,20 @@
         query = nil;
                 
         
-        //make a request
-        NSURLRequest *request = [NSURLRequest requestWithURL:url];
+        // make a request
+        NSURLRequest *request = [NSURLRequest requestWithURL:url
+                                                 cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData 
+                                             timeoutInterval:10.0];
         
-        //NSURLConnection need to be called on the main thread
-        [self performSelectorOnMainThread:@selector(httpRequestWithRequest:) 
-                               withObject:request 
-                            waitUntilDone:YES];
+        NSURLConnection *connection = [NSURLConnection connectionWithRequest:request 
+                                                                    delegate:self];
+        if (connection) {
+            _httpRequestData = [NSMutableData data];
+        }
+        else {
+            // connection failed
+            [self connection:connection didFailWithError:nil];
+        }
     }
 }
 
@@ -166,7 +164,9 @@
 - (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SocketIOCallback)function
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:eventName forKey:@"name"];
-    if (data != nil) { // do not require arguments
+
+    // do not require arguments
+    if (data != nil) {
         [dict setObject:data forKey:@"args"];
     }
     
@@ -179,7 +179,7 @@
     [self send:packet];
 }
 
-- (void)sendAcknowledgement:(NSString *)pId withArgs:(NSArray *)data 
+- (void) sendAcknowledgement:(NSString *)pId withArgs:(NSArray *)data 
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"ack"];
     packet.data = [data JSONRepresentation];
@@ -200,8 +200,15 @@
     
     _webSocket = [[WebSocket alloc] initWithURLString:url delegate:self];
     [self log:[NSString stringWithFormat:@"Opening %@", url]];
-    [_webSocket open];
+    [_webSocket open];    
+}
+
+- (void) openXHRPolling
+{
+    NSString *url = [NSString stringWithFormat:XHR_URL, _host, _port, _sid];
+    [self log:[NSString stringWithFormat:@"Opening XHR @ %@", url]];
     
+    // TODO: implement
 }
 
 - (void) sendDisconnect
@@ -548,15 +555,18 @@
 
 # pragma mark -
 # pragma mark Handshake callbacks (NSURLConnectionDataDelegate)
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+- (void) connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response 
+{
     [_httpRequestData setLength:0];
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+- (void) connection:(NSURLConnection *)connection didReceiveData:(NSData *)data 
+{
     [_httpRequestData appendData:data]; 
 }
 
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+- (void) connection:(NSURLConnection *)connection didFailWithError:(NSError *)error 
+{
     NSLog(@"ERROR: handshake failed ... %@", [error localizedDescription]);
     
     _isConnected = NO;
@@ -567,7 +577,8 @@
     }
 }
 
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection { 	
+- (void) connectionDidFinishLoading:(NSURLConnection *)connection 
+{ 	
  	NSString *responseString = [[NSString alloc] initWithData:_httpRequestData encoding:NSASCIIStringEncoding];
 
     [self log:[NSString stringWithFormat:@"requestFinished() %@", responseString]];
@@ -586,14 +597,19 @@
     NSArray *transports = [t componentsSeparatedByString:@","];
     [self log:[NSString stringWithFormat:@"transports: %@", transports]];
     
+    // TODO: check which transports are supported by the server
+    
+    // if websocket
     [self openSocket];
+    
+    // TODO: if xhr ...
 }
 
 
 # pragma mark -
 # pragma mark WebSocket Delegate Methods
 
-- (void) webSocketDidClose:(WebSocket*)webSocket 
+- (void) webSocketDidClose:(WebSocket *)webSocket 
 {
     [self log:[NSString stringWithFormat:@"Connection closed."]];
     [self onDisconnect];

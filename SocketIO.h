@@ -1,6 +1,6 @@
 //
 //  SocketIO.h
-//  v.02 ARC
+//  v0.21 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -47,7 +47,7 @@ typedef void(^SocketIOCallback)(id argsData);
     NSString *_sid;
     NSString *_endpoint;
     
-    id<SocketIODelegate> _delegate;
+    __unsafe_unretained id<SocketIODelegate> _delegate;
     
     WebSocket *_webSocket;
     
@@ -64,7 +64,7 @@ typedef void(^SocketIOCallback)(id argsData);
     NSMutableDictionary *_acks;
     NSInteger _ackCount;
     
-    //http request
+    // http request
     NSMutableData * _httpRequestData;
 }
 
