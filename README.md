@@ -6,8 +6,14 @@
 
    * [cocoa-websocket](https://github.com/samlown/cocoa-websocket)
    * [RegexKitLite](http://regexkit.sourceforge.net/RegexKitLite/)
+
+  For the RegexKitLite to work, you have to add the following `Other Linker Flags`: `-licucore`.
+  [RegexKitLite Docs](http://regexkit.sourceforge.net/RegexKitLite/index.html#AddingRegexKitLitetoyourProject)
+
    * [json-framework](https://github.com/stig/json-framework/)
    * [ASIHTTPRequest](http://allseeing-i.com/ASIHTTPRequest/)
+
+  For ASIHTTPRequest to work correctly, you have to add multiple libraries - described in their [setup instructions](http://allseeing-i.com/ASIHTTPRequest/Setup-instructions).
 
   There are several cocoa-websocket repos around with marginally different interfaces. This version is known to work with
   repo suggested above with at least Draft 76 support. See repo's fork list for alternatives.
