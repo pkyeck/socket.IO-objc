@@ -1,0 +1,9 @@
+[submodule "submodules/cocoa-websocket"]
+	path = submodules/cocoa-websocket
+	url = https://github.com/samlown/cocoa-websocket.git
+[submodule "submodules/json-framework"]
+	path = submodules/json-framework
+	url = https://github.com/stig/json-framework.git
+[submodule "submodules/RegexKitLite"]
+	path = submodules/RegexKitLite
+	url = https://github.com/samdeane/RegexKitLite.git
