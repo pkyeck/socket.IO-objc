@@ -7,7 +7,7 @@
 //  by Fred Potter <fpotter@pieceable.com>
 //
 //  using
-//  https://github.com/bnadim/cocoa-websocket
+//  https://github.com/samlown/cocoa-websocket
 //  https://github.com/stig/json-framework/
 //
 //  reusing some parts of
@@ -17,7 +17,6 @@
 //
 //  Updated by 
 //    samlown   https://github.com/samlown
-//    bnadim    https://github.com/bnadim
 //
 
 #import <Foundation/Foundation.h>
@@ -96,7 +95,6 @@ typedef void(^SocketIOCallback)(id argsData);
     NSString *data;
     NSArray *args;
     NSString *endpoint;
-    
     NSArray *_types;
 }
 
