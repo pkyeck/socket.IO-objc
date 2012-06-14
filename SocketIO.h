@@ -1,13 +1,13 @@
 //
 //  SocketIO.h
-//  v0.21 ARC
+//  v0.22 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
 //  by Fred Potter <fpotter@pieceable.com>
 //
 //  using
-//  https://github.com/samlown/cocoa-websocket
+//  https://github.com/square/SocketRocket
 //  https://github.com/stig/json-framework/
 //
 //  reusing some parts of
@@ -17,11 +17,12 @@
 //
 //  Updated by 
 //    samlown   https://github.com/samlown
+//    kayleg    https://github.com/kayleg
 //
 
 #import <Foundation/Foundation.h>
 
-@class WebSocket;
+@class SRWebSocket;
 @class SocketIO;
 @class SocketIOPacket;
 
@@ -48,10 +49,11 @@ typedef void(^SocketIOCallback)(id argsData);
     
     __unsafe_unretained id<SocketIODelegate> _delegate;
     
-    WebSocket *_webSocket;
+    SRWebSocket *_webSocket;
     
     BOOL _isConnected;
     BOOL _isConnecting;
+    BOOL _useSecure;
     
     // heartbeat
     NSTimeInterval _heartbeatTimeout;
@@ -68,6 +70,7 @@ typedef void(^SocketIOCallback)(id argsData);
 }
 
 @property (nonatomic, readonly) BOOL isConnected, isConnecting;
+@property (nonatomic) BOOL useSecure;
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port;

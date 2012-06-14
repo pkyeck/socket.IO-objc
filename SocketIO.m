@@ -1,13 +1,13 @@
 //
 //  SocketIO.m
-//  v0.21 ARC
+//  v0.22 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
 //  by Fred Potter <fpotter@pieceable.com>
 //
 //  using
-//  https://github.com/samlown/cocoa-websocket
+//  https://github.com/square/SocketRocket
 //  https://github.com/stig/json-framework/
 //
 //  reusing some parts of
@@ -17,23 +17,29 @@
 //
 //  Updated by 
 //    samlown   https://github.com/samlown
+//    kayleg    https://github.com/kayleg
 //
 
 #import "SocketIO.h"
 
-#import "WebSocket.h"
+#import "SRWebSocket.h"
 #import "SBJson.h"
 
 #define DEBUG_LOGS 1
-#define HANDSHAKE_URL @"http://%@:%d/socket.io/1/?t=%d%@"
-#define SOCKET_URL @"ws://%@:%d/socket.io/1/websocket/%@"
-#define XHR_URL @"http://%@:%d/socket.io/1/xhr-polling/%@"
+#define DEBUG_CERTIFICATE 1
+
+static NSString* kInsecureHandshakeURL = @"http://%@:%d/socket.io/1/?t=%d%@";
+static NSString* kSecureHandshakeURL = @"https://%@:%d/socket.io/1/?t=%d%@";
+static NSString* kInsecureSocketURL = @"ws://%@:%d/socket.io/1/websocket/%@";
+static NSString* kSecureSocketURL = @"wss://%@:%d/socket.io/1/websocket/%@";
+static NSString* kInsecureXHRURL = @"http://%@:%d/socket.io/1/xhr-polling/%@";
+static NSString* kSecureXHRURL = @"https://%@:%d/socket.io/1/xhr-polling/%@";
 
 
 # pragma mark -
 # pragma mark SocketIO's private interface
 
-@interface SocketIO (Private) <WebSocketDelegate>
+@interface SocketIO (Private) <SRWebSocketDelegate>
 
 - (NSArray*) arrayOfCaptureComponentsMatchedByRegex:(NSString*)regex;
 
@@ -60,7 +66,7 @@
 
 @implementation SocketIO
 
-@synthesize isConnected = _isConnected, isConnecting = _isConnecting;
+@synthesize isConnected = _isConnected, isConnecting = _isConnecting, useSecure = _useSecure;
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate
 {
@@ -101,7 +107,7 @@
         }];
         
         // do handshake via HTTP request
-        NSString *s = [NSString stringWithFormat:HANDSHAKE_URL, _host, _port, rand(), query];
+        NSString *s = [NSString stringWithFormat:(_useSecure ? kSecureHandshakeURL : kInsecureHandshakeURL), _host, _port, rand(), query];
         [self log:[NSString stringWithFormat:@"Connecting to socket with URL: %@",s]];
         NSURL *url = [NSURL URLWithString:s];
         query = nil;
@@ -193,18 +199,20 @@
 
 - (void) openSocket
 {
-    NSString *url = [NSString stringWithFormat:SOCKET_URL, _host, _port, _sid];
+    NSString *urlStr = [NSString stringWithFormat:(_useSecure ? kSecureSocketURL : kInsecureSocketURL), _host, _port, _sid];
+    NSURL *url = [NSURL URLWithString:urlStr];
 
     _webSocket = nil;
     
-    _webSocket = [[WebSocket alloc] initWithURLString:url delegate:self];
+    _webSocket = [[SRWebSocket alloc] initWithURL:url];
+    _webSocket.delegate = self;
     [self log:[NSString stringWithFormat:@"Opening %@", url]];
     [_webSocket open];    
 }
 
 - (void) openXHRPolling
 {
-    NSString *url = [NSString stringWithFormat:XHR_URL, _host, _port, _sid];
+    NSString *url = [NSString stringWithFormat:(_useSecure ? kSecureXHRURL : kInsecureXHRURL), _host, _port, _sid];
     [self log:[NSString stringWithFormat:@"Opening XHR @ %@", url]];
     
     // TODO: implement
@@ -470,7 +478,7 @@
     }
     
     // Disconnect the websocket, just in case
-    if (_webSocket != nil && [_webSocket connected]) {
+    if (_webSocket != nil) {
         [_webSocket close];
     }
     
@@ -604,32 +612,64 @@
     // TODO: if xhr ...
 }
 
+#if DEBUG_CERTIFICATE
+
+// to deal with self-signed certificates
+- (BOOL) connection:(NSURLConnection *)connection
+canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace
+{
+    return [protectionSpace.authenticationMethod
+            isEqualToString:NSURLAuthenticationMethodServerTrust];
+}
+
+- (void) connection:(NSURLConnection *)connection
+didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
+    if ([challenge.protectionSpace.authenticationMethod
+         isEqualToString:NSURLAuthenticationMethodServerTrust])
+    {
+        // we only trust our own domain
+        if ([challenge.protectionSpace.host isEqualToString:_host])
+        {
+            NSURLCredential *credential =
+            [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
+            [challenge.sender useCredential:credential forAuthenticationChallenge:challenge];
+        }
+    }
+    
+    [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+}
+#endif
 
 # pragma mark -
 # pragma mark WebSocket Delegate Methods
 
-- (void) webSocketDidClose:(WebSocket *)webSocket 
+- (void) webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)message
 {
-    [self log:[NSString stringWithFormat:@"Connection closed."]];
-    [self onDisconnect];
+    [self onData:message];
 }
 
-- (void) webSocketDidOpen:(WebSocket *)ws 
+- (void) webSocketDidOpen:(SRWebSocket *)webSocket
 {
-    [self log:[NSString stringWithFormat:@"Connection opened."]];
+    [self log:[NSString stringWithFormat:@"Socket opened."]];
 }
 
-- (void) webSocket:(WebSocket *)ws didFailWithError:(NSError *)error 
+- (void) webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error
 {
-    NSLog(@"ERROR: Connection failed with error ... %@", [error localizedDescription]);
+    NSLog(@"ERROR: Socket failed with error ... %@", [error localizedDescription]);
     // Assuming this resulted in a disconnect
     [self onDisconnect];
 }
 
-- (void) webSocket:(WebSocket *)ws didReceiveMessage:(NSString*)message 
+- (void) webSocket:(SRWebSocket *)webSocket 
+  didCloseWithCode:(NSInteger)code 
+            reason:(NSString *)reason 
+          wasClean:(BOOL)wasClean
 {
-    [self onData:message];
+    [self log:[NSString stringWithFormat:@"Socket closed."]];
+    [self onDisconnect];
 }
+
 
 # pragma mark -
 
