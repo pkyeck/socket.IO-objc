@@ -79,6 +79,7 @@
 
 Initial project by Philipp Kyeck <philipp@beta-interactive.de>.  
 Namespace support by Sam Lown <sam@cabify.com> at Cabify.
+SSL support by kayleg <https://github.com/kayleg>.  
 
 ## License 
 
