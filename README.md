@@ -4,10 +4,8 @@
   with the help of websockets. It's based on fpotter's [socketio-cocoa](https://github.com/fpotter/socketio-cocoa) 
   and uses other libraries/classes like 
 
-   * [cocoa-websocket](https://github.com/samlown/cocoa-websocket) (non ARC)  
-  Remember to add the `-fno-objc-arc` Compiler Flag to all files from this module because they don't support ARC yet.  
-  There are several cocoa-websocket repos around with marginally different interfaces. This version is known to work with
-  repo suggested above with at least Draft 76 support. See repo's fork list for alternatives.
+   * [SocketRocket](https://github.com/square/SocketRocket)
+  Look [here](https://github.com/square/SocketRocket#installing-ios) for further instructions how to use/install SocketRocket.
 
    * [json-framework](https://github.com/stig/json-framework/)
 
