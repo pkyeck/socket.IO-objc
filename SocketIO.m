@@ -28,12 +28,18 @@
 #define DEBUG_LOGS 1
 #define DEBUG_CERTIFICATE 1
 
-static NSString* kInsecureHandshakeURL = @"http://%@:%d/socket.io/1/?t=%d%@";
-static NSString* kSecureHandshakeURL = @"https://%@:%d/socket.io/1/?t=%d%@";
-static NSString* kInsecureSocketURL = @"ws://%@:%d/socket.io/1/websocket/%@";
-static NSString* kSecureSocketURL = @"wss://%@:%d/socket.io/1/websocket/%@";
-static NSString* kInsecureXHRURL = @"http://%@:%d/socket.io/1/xhr-polling/%@";
-static NSString* kSecureXHRURL = @"https://%@:%d/socket.io/1/xhr-polling/%@";
+static NSString* kInsecureHandshakeURL = @"http://%@/socket.io/1/?t=%d%@";
+static NSString* kInsecureHandshakePortURL = @"http://%@:%d/socket.io/1/?t=%d%@";
+static NSString* kSecureHandshakePortURL = @"https://%@:%d/socket.io/1/?t=%d%@";
+static NSString* kSecureHandshakeURL = @"https://%@/socket.io/1/?t=%d%@";
+static NSString* kInsecureSocketURL = @"ws://%@/socket.io/1/websocket/%@";
+static NSString* kSecureSocketURL = @"wss://%@/socket.io/1/websocket/%@";
+static NSString* kInsecureXHRURL = @"http://%@/socket.io/1/xhr-polling/%@";
+static NSString* kSecureXHRURL = @"https://%@/socket.io/1/xhr-polling/%@";
+static NSString* kInsecureSocketPortURL = @"ws://%@:%d/socket.io/1/websocket/%@";
+static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@";
+static NSString* kInsecureXHRPortURL = @"http://%@:%d/socket.io/1/xhr-polling/%@";
+static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@";
 
 
 # pragma mark -
@@ -98,6 +104,7 @@ static NSString* kSecureXHRURL = @"https://%@:%d/socket.io/1/xhr-polling/%@";
         
         _host = host;
         _port = port;
+        _params = params;
         _endpoint = [endpoint copy];
         
         // create a query parameters string
@@ -107,7 +114,11 @@ static NSString* kSecureXHRURL = @"https://%@:%d/socket.io/1/xhr-polling/%@";
         }];
         
         // do handshake via HTTP request
-        NSString *s = [NSString stringWithFormat:(_useSecure ? kSecureHandshakeURL : kInsecureHandshakeURL), _host, _port, rand(), query];
+        NSString *s;
+        if(_port)
+            s = [NSString stringWithFormat:(_useSecure ? kSecureHandshakePortURL : kInsecureHandshakePortURL), _host, _port, rand(), query];
+        else
+            s = [NSString stringWithFormat:(_useSecure ? kSecureHandshakeURL : kInsecureHandshakeURL), _host, rand(), query];
         [self log:[NSString stringWithFormat:@"Connecting to socket with URL: %@",s]];
         NSURL *url = [NSURL URLWithString:s];
         query = nil;
@@ -199,7 +210,11 @@ static NSString* kSecureXHRURL = @"https://%@:%d/socket.io/1/xhr-polling/%@";
 
 - (void) openSocket
 {
-    NSString *urlStr = [NSString stringWithFormat:(_useSecure ? kSecureSocketURL : kInsecureSocketURL), _host, _port, _sid];
+    NSString *urlStr;
+    if(_port)
+        urlStr = [NSString stringWithFormat:(_useSecure ? kSecureSocketPortURL : kInsecureSocketPortURL), _host, _port, _sid];
+    else
+        urlStr = [NSString stringWithFormat:(_useSecure ? kSecureSocketURL : kInsecureSocketURL), _host, _sid];
     NSURL *url = [NSURL URLWithString:urlStr];
 
     _webSocket = nil;
@@ -212,7 +227,11 @@ static NSString* kSecureXHRURL = @"https://%@:%d/socket.io/1/xhr-polling/%@";
 
 - (void) openXHRPolling
 {
-    NSString *url = [NSString stringWithFormat:(_useSecure ? kSecureXHRURL : kInsecureXHRURL), _host, _port, _sid];
+    NSString *url;
+    if (_port)
+        url = [NSString stringWithFormat:(_useSecure ? kSecureXHRPortURL : kInsecureXHRPortURL), _host, _port, _sid];
+    else
+        url = [NSString stringWithFormat:(_useSecure ? kSecureXHRURL : kInsecureXHRURL), _host, _sid];
     [self log:[NSString stringWithFormat:@"Opening XHR @ %@", url]];
     
     // TODO: implement
@@ -273,7 +292,7 @@ static NSString* kSecureXHRURL = @"https://%@:%d/socket.io/1/xhr-polling/%@";
     }
     
     NSString *req = [encoded componentsJoinedByString:@":"];
-    if (!_isConnected) {
+    if (_webSocket.readyState != SR_OPEN) {
         [self log:[NSString stringWithFormat:@"queue >>> %@", req]];
         [_queue addObject:packet];
     } 
@@ -593,6 +612,12 @@ static NSString* kSecureXHRURL = @"https://%@:%d/socket.io/1/xhr-polling/%@";
     
     _sid = [data objectAtIndex:0];
     [self log:[NSString stringWithFormat:@"sid: %@", _sid]];
+    NSString *regex = @"[^0-9]";
+    NSPredicate *regexTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+    if ([_sid rangeOfString:@"error"].location != NSNotFound || [regexTest evaluateWithObject:_sid]) {
+        [self connectToHost:_host onPort:_port withParams:_params withNamespace:_endpoint];
+        return;
+    }
     
     // add small buffer of 7sec (magic xD)
     _heartbeatTimeout = [[data objectAtIndex:1] floatValue] + 7.0;
