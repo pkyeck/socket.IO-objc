@@ -104,6 +104,7 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
         
         _host = host;
         _port = port;
+        _params = params;
         _endpoint = [endpoint copy];
         
         // create a query parameters string
@@ -611,6 +612,12 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
     
     _sid = [data objectAtIndex:0];
     [self log:[NSString stringWithFormat:@"sid: %@", _sid]];
+    NSString *regex = @"[^0-9]";
+    NSPredicate *regexTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+    if ([_sid rangeOfString:@"error"].location != NSNotFound || [regexTest evaluateWithObject:_sid]) {
+        [self connectToHost:_host onPort:_port withParams:_params withNamespace:_endpoint];
+        return;
+    }
     
     // add small buffer of 7sec (magic xD)
     _heartbeatTimeout = [[data objectAtIndex:1] floatValue] + 7.0;

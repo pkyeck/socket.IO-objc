@@ -46,6 +46,7 @@ typedef void(^SocketIOCallback)(id argsData);
     NSInteger _port;
     NSString *_sid;
     NSString *_endpoint;
+    NSDictionary *_params;
     
     __unsafe_unretained id<SocketIODelegate> _delegate;
     
