@@ -115,10 +115,12 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
         
         // do handshake via HTTP request
         NSString *s;
-        if(_port)
+        if (_port) {
             s = [NSString stringWithFormat:(_useSecure ? kSecureHandshakePortURL : kInsecureHandshakePortURL), _host, _port, rand(), query];
-        else
+        }
+        else {
             s = [NSString stringWithFormat:(_useSecure ? kSecureHandshakeURL : kInsecureHandshakeURL), _host, rand(), query];
+        }
         [self log:[NSString stringWithFormat:@"Connecting to socket with URL: %@",s]];
         NSURL *url = [NSURL URLWithString:s];
         query = nil;
@@ -144,6 +146,9 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
 - (void) disconnect
 {
     [self sendDisconnect];
+    
+    // clear delegate - otherwise crashes
+    _delegate = nil;
 }
 
 - (void) sendMessage:(NSString *)data
@@ -498,6 +503,8 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
     
     // Disconnect the websocket, just in case
     if (_webSocket != nil) {
+        // clear websocket's delegate - otherwise crashes
+        _webSocket.delegate = nil;
         [_webSocket close];
     }
     

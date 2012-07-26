@@ -4,7 +4,7 @@
   with the help of websockets. It's based on fpotter's [socketio-cocoa](https://github.com/fpotter/socketio-cocoa) 
   and uses other libraries/classes like 
 
-   * [SocketRocket](https://github.com/square/SocketRocket)
+   * [SocketRocket](https://github.com/square/SocketRocket)  
   Look [here](https://github.com/square/SocketRocket#installing-ios) for further instructions how to use/install SocketRocket.
 
    * [json-framework](https://github.com/stig/json-framework/)
@@ -76,7 +76,7 @@
 ## Authors
 
 Initial project by Philipp Kyeck <philipp@beta-interactive.de>.  
-Namespace support by Sam Lown <sam@cabify.com> at Cabify.
+Namespace support by Sam Lown <sam@cabify.com> at Cabify.  
 SSL support by kayleg <https://github.com/kayleg>.  
 
 ## License 
