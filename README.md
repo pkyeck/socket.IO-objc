@@ -77,7 +77,7 @@
 
 ## Authors
 
-Initial project by Philipp Kyeck <philipp@beta-interactive.de>.  
+Initial project by Philipp Kyeck <http://beta-interactive.de>.  
 Namespace support by Sam Lown <sam@cabify.com> at Cabify.  
 SSL support by kayleg <https://github.com/kayleg>.  
 
@@ -85,7 +85,7 @@ SSL support by kayleg <https://github.com/kayleg>.
 
 (The MIT License)
 
-Copyright (c) 2011-12 Philipp Kyeck <philipp@beta-interactive.de>
+Copyright (c) 2011-12 Philipp Kyeck <http://beta-interactive.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
