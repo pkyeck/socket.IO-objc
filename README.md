@@ -11,7 +11,8 @@
 
 ## Non-ARC version
 
-  If you're old school - there's still the [non-ARC version](https://github.com/pkyeck/socket.IO-objc/tree/non-arc) for you.
+  If you're old school - there's still the [non-ARC version](https://github.com/pkyeck/socket.IO-objc/tree/non-arc) for you.  
+  This version (the non-ARC one) is out-of-date and won't be maintained any further (at least not by me).
 
 ## Usage
 
