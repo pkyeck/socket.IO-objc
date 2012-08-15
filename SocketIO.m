@@ -99,8 +99,7 @@ NSString* const SocketIOError = @"SocketIOError";
 
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint
 {
-    if (!_isConnected && !_isConnecting) 
-    {
+    if (!_isConnected && !_isConnecting) {
         _isConnecting = YES;
         
         _host = host;
@@ -111,18 +110,21 @@ NSString* const SocketIOError = @"SocketIOError";
         // create a query parameters string
         NSMutableString *query = [[NSMutableString alloc] initWithString:@""];
         [params enumerateKeysAndObjectsUsingBlock: ^(id key, id value, BOOL *stop) {
-            [query appendFormat:@"&%@=%@",key,value];
+            [query appendFormat:@"&%@=%@", key, value];
         }];
         
         // do handshake via HTTP request
         NSString *s;
+        NSString *format;
         if (_port) {
-            s = [NSString stringWithFormat:(_useSecure ? kSecureHandshakePortURL : kInsecureHandshakePortURL), _host, _port, rand(), query];
+            format = _useSecure ? kSecureHandshakePortURL : kInsecureHandshakePortURL;
+            s = [NSString stringWithFormat:format, _host, _port, rand(), query];
         }
         else {
-            s = [NSString stringWithFormat:(_useSecure ? kSecureHandshakeURL : kInsecureHandshakeURL), _host, rand(), query];
+            format = _useSecure ? kSecureHandshakeURL : kInsecureHandshakeURL;
+            s = [NSString stringWithFormat:format, _host, rand(), query];
         }
-        [self log:[NSString stringWithFormat:@"Connecting to socket with URL: %@",s]];
+        [self log:[NSString stringWithFormat:@"Connecting to socket with URL: %@", s]];
         NSURL *url = [NSURL URLWithString:s];
         query = nil;
                 
@@ -217,10 +219,15 @@ NSString* const SocketIOError = @"SocketIOError";
 - (void) openSocket
 {
     NSString *urlStr;
-    if(_port)
-        urlStr = [NSString stringWithFormat:(_useSecure ? kSecureSocketPortURL : kInsecureSocketPortURL), _host, _port, _sid];
-    else
-        urlStr = [NSString stringWithFormat:(_useSecure ? kSecureSocketURL : kInsecureSocketURL), _host, _sid];
+    NSString *format;
+    if(_port) {
+        format = _useSecure ? kSecureSocketPortURL : kInsecureSocketPortURL;
+        urlStr = [NSString stringWithFormat:format, _host, _port, _sid];
+    }
+    else {
+        format = _useSecure ? kSecureSocketURL : kInsecureSocketURL;
+        urlStr = [NSString stringWithFormat:format, _host, _sid];
+    }
     NSURL *url = [NSURL URLWithString:urlStr];
 
     _webSocket = nil;
@@ -234,10 +241,15 @@ NSString* const SocketIOError = @"SocketIOError";
 - (void) openXHRPolling
 {
     NSString *url;
-    if (_port)
-        url = [NSString stringWithFormat:(_useSecure ? kSecureXHRPortURL : kInsecureXHRPortURL), _host, _port, _sid];
-    else
-        url = [NSString stringWithFormat:(_useSecure ? kSecureXHRURL : kInsecureXHRURL), _host, _sid];
+    NSString *format;
+    if (_port) {
+        format = _useSecure ? kSecureXHRPortURL : kInsecureXHRPortURL;
+        url = [NSString stringWithFormat:format, _host, _port, _sid];
+    }
+    else {
+        format = _useSecure ? kSecureXHRURL : kInsecureXHRURL;
+        url = [NSString stringWithFormat:format, _host, _sid];
+    }
     [self log:[NSString stringWithFormat:@"Opening XHR @ %@", url]];
     
     // TODO: implement
@@ -268,8 +280,7 @@ NSString* const SocketIOError = @"SocketIOError";
     NSMutableArray *encoded = [NSMutableArray arrayWithObject:type];
     
     NSString *pId = packet.pId != nil ? packet.pId : @"";
-    if ([packet.ack isEqualToString:@"data"])
-    {
+    if ([packet.ack isEqualToString:@"data"]) {
         pId = [pId stringByAppendingString:@"+"];
     }
     
@@ -670,21 +681,18 @@ NSString* const SocketIOError = @"SocketIOError";
 - (BOOL) connection:(NSURLConnection *)connection
 canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace
 {
-    return [protectionSpace.authenticationMethod
-            isEqualToString:NSURLAuthenticationMethodServerTrust];
+    return [protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust];
 }
 
 - (void) connection:(NSURLConnection *)connection
 didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 {
     if ([challenge.protectionSpace.authenticationMethod
-         isEqualToString:NSURLAuthenticationMethodServerTrust])
-    {
+         isEqualToString:NSURLAuthenticationMethodServerTrust]) {
         // we only trust our own domain
-        if ([challenge.protectionSpace.host isEqualToString:_host])
-        {
-            NSURLCredential *credential =
-            [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
+        if ([challenge.protectionSpace.host isEqualToString:_host]) {
+            SecTrustRef trust = challenge.protectionSpace.serverTrust;
+            NSURLCredential *credential = [NSURLCredential credentialForTrust:trust];
             [challenge.sender useCredential:credential forAuthenticationChallenge:challenge];
         }
     }
