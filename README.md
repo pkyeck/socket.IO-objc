@@ -16,6 +16,8 @@
    * [ASIHTTPRequest](http://allseeing-i.com/ASIHTTPRequest/)  
   For ASIHTTPRequest to work correctly, you have to add multiple libraries - described in their [setup instructions](http://allseeing-i.com/ASIHTTPRequest/Setup-instructions).
 
+## This version (the non-ARC one) is out-of-date and won't be maintained any further (at least not by me)
+
 ## Usage
 
   The easiest way to connect to your Socket.IO / node.js server is
@@ -78,14 +80,14 @@
 
 ## Authors
 
-Initial project by Philipp Kyeck <philipp@beta-interactive.de>.  
+Initial project by Philipp Kyeck <http://beta-interactive.de>.  
 Namespace support by Sam Lown <sam@cabify.com> at Cabify.
 
 ## License 
 
 (The MIT License)
 
-Copyright (c) 2011 Philipp Kyeck <philipp@beta-interactive.de>
+Copyright (c) 2011 Philipp Kyeck <http://beta-interactive.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
