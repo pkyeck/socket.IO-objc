@@ -28,6 +28,12 @@
 
 typedef void(^SocketIOCallback)(id argsData);
 
+extern NSString* const SocketIOError;
+
+typedef enum {
+    SocketIOServerRespondedWithInvalidConnectionData = -1
+} SocketIOErrorCodes;
+
 @protocol SocketIODelegate <NSObject>
 @optional
 - (void) socketIODidConnect:(SocketIO *)socket;
@@ -37,6 +43,7 @@ typedef void(^SocketIOCallback)(id argsData);
 - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didSendMessage:(SocketIOPacket *)packet;
 - (void) socketIOHandshakeFailed:(SocketIO *)socket;
+- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error;
 @end
 
 

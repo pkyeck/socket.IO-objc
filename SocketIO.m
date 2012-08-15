@@ -41,6 +41,7 @@ static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@";
 static NSString* kInsecureXHRPortURL = @"http://%@:%d/socket.io/1/xhr-polling/%@";
 static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@";
 
+NSString* const SocketIOError = @"SocketIOError";
 
 # pragma mark -
 # pragma mark SocketIO's private interface
@@ -618,6 +619,25 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
     NSArray *data = [responseString componentsSeparatedByString:@":"];
     
     _sid = [data objectAtIndex:0];
+    if ([_sid length] < 1 || [data count] < 3) {
+        // did not receive valid data, possibly missing a useSecure?
+        
+        if ([_delegate respondsToSelector:@selector(socketIO:failedToConnectWithError:)]) {
+            NSError* error;
+            
+            error = [NSError errorWithDomain:SocketIOError
+                                        code:SocketIOServerRespondedWithInvalidConnectionData
+                                    userInfo:nil];
+            
+            [_delegate socketIO:self failedToConnectWithError:error];
+        }
+        
+        // make sure to do call all cleanup code
+        [self onDisconnect];
+        
+        return;
+    }
+
     [self log:[NSString stringWithFormat:@"sid: %@", _sid]];
     NSString *regex = @"[^0-9]";
     NSPredicate *regexTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
