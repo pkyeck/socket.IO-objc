@@ -65,6 +65,8 @@
 	- (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
 	- (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
 	- (void) socketIO:(SocketIO *)socket didSendMessage:(SocketIOPacket *)packet;
+	- (void) socketIOHandshakeFailed:(SocketIO *)socket;
+	- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error;
 
   To process an incoming Message just
 
