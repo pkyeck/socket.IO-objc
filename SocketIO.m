@@ -444,7 +444,7 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
 
 - (void) doQueue 
 {
-    [self log:[NSString stringWithFormat:@"doQueue() >> %d", [_queue count]]];
+    [self log:[NSString stringWithFormat:@"doQueue() >> %lu", (unsigned long)[_queue count]]];
     
     // TODO send all packets at once ... not as seperate packets
     while ([_queue count] > 0) {
@@ -521,7 +521,7 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
 {
     if (function) {
         ++_ackCount;
-        NSString *ac = [NSString stringWithFormat:@"%d", _ackCount];
+        NSString *ac = [NSString stringWithFormat:@"%ld", (long)_ackCount];
         [_acks setObject:[function copy] forKey:ac];
         return ac;
     }
@@ -568,7 +568,7 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
     
     for (NSTextCheckingResult *nsmatchTest in nsmatchesTest) {
         NSMutableArray *localMatch = [NSMutableArray array];
-        for (int i = 0, l = [nsmatchTest numberOfRanges]; i < l; i++) {
+        for (NSUInteger i = 0, l = [nsmatchTest numberOfRanges]; i < l; i++) {
             NSRange range = [nsmatchTest rangeAtIndex:i];
             NSString *nsmatchStr = nil;
             if (range.location != NSNotFound && NSMaxRange(range) <= [data length]) {
@@ -782,8 +782,8 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 
 - (NSNumber *) typeAsNumber
 {
-    int index = [_types indexOfObject:self.type];
-    NSNumber *num = [NSNumber numberWithInt:index];
+    NSUInteger index = [_types indexOfObject:self.type];
+    NSNumber *num = [NSNumber numberWithUnsignedInteger:index];
     return num;
 }
 
