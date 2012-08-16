@@ -79,6 +79,7 @@ typedef enum {
 
 @property (nonatomic, readonly) BOOL isConnected, isConnecting;
 @property (nonatomic) BOOL useSecure;
+@property (nonatomic, unsafe_unretained) id<SocketIODelegate> delegate;
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port;

@@ -73,7 +73,10 @@ NSString* const SocketIOError = @"SocketIOError";
 
 @implementation SocketIO
 
-@synthesize isConnected = _isConnected, isConnecting = _isConnecting, useSecure = _useSecure;
+@synthesize isConnected = _isConnected, 
+            isConnecting = _isConnecting, 
+            useSecure = _useSecure, 
+            delegate = _delegate;
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate
 {
@@ -149,9 +152,6 @@ NSString* const SocketIOError = @"SocketIOError";
 - (void) disconnect
 {
     [self sendDisconnect];
-    
-    // clear delegate - otherwise crashes
-    _delegate = nil;
 }
 
 - (void) sendMessage:(NSString *)data
