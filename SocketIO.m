@@ -22,10 +22,11 @@
 
 #import "SocketIO.h"
 
-#import "SRWebSocket.h"
-#import "SBJson.h"
+//#import "SRWebSocket.h"
+//#import "SBJson.h"
+#import <SocketRocket/SRWebSocket.h>
 
-#define DEBUG_LOGS 1
+#define DEBUG_LOGS 0
 #define DEBUG_CERTIFICATE 1
 
 static NSString* kInsecureHandshakeURL = @"http://%@/socket.io/1/?t=%d%@";
@@ -175,7 +176,9 @@ NSString* const SocketIOError = @"SocketIOError";
 - (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"json"];
-    packet.data = [data JSONRepresentation];
+//    packet.data = [data JSONRepresentation];
+    packet.data = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:data options:0 error:nil]
+                                        encoding:NSUTF8StringEncoding];
     packet.pId = [self addAcknowledge:function];
     [self send:packet];
 }
@@ -195,7 +198,8 @@ NSString* const SocketIOError = @"SocketIOError";
     }
     
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"event"];
-    packet.data = [dict JSONRepresentation];
+//    packet.data = [dict JSONRepresentation];
+    
     packet.pId = [self addAcknowledge:function];
     if (function) {
         packet.ack = @"data";
@@ -206,7 +210,9 @@ NSString* const SocketIOError = @"SocketIOError";
 - (void) sendAcknowledgement:(NSString *)pId withArgs:(NSArray *)data 
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"ack"];
-    packet.data = [data JSONRepresentation];
+//    packet.data = [data JSONRepresentation];
+    packet.data = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:data options:0 error:nil]
+                                        encoding:NSUTF8StringEncoding];
     packet.pId = pId;
     packet.ack = @"data";
 
@@ -415,7 +421,8 @@ NSString* const SocketIOError = @"SocketIOError";
                     NSString *argsStr = [piece objectAtIndex:3];
                     id argsData = nil;
                     if (argsStr && ![argsStr isEqualToString:@""]) {
-                        argsData = [argsStr JSONValue];
+//                        argsData = [argsStr JSONValue];
+                        argsData = [NSJSONSerialization JSONObjectWithData:[argsStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
                         if ([argsData count] > 0) {
                             argsData = [argsData objectAtIndex:0];
                         }
@@ -805,7 +812,8 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 
 - (id) dataAsJSON
 {
-    return [self.data JSONValue];
+    return [NSJSONSerialization JSONObjectWithData:[self.data dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+//    return [self.data JSONValue];
 }
 
 - (NSNumber *) typeAsNumber
