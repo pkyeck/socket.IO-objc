@@ -36,6 +36,7 @@
 		4ADCCBF115790FD30022990C /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBF015790FD30022990C /* MobileCoreServices.framework */; };
 		4ADCCBF315790FDF0022990C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBF215790FDF0022990C /* SystemConfiguration.framework */; };
 		4ADCCD4D157915F00022990C /* SocketIO.m in Sources */ = {isa = PBXBuildFile; fileRef = 4ADCCBC715790DEC0022990C /* SocketIO.m */; };
+		C9E391A215E2A1B00004693A /* SocketIOJSONSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -91,6 +92,8 @@
 		4ADCCBEE15790FC70022990C /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		4ADCCBF015790FD30022990C /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		4ADCCBF215790FDF0022990C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		C9E391A015E2A1B00004693A /* SocketIOJSONSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOJSONSerialization.h; sourceTree = SOURCE_ROOT; };
+		C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOJSONSerialization.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -203,6 +206,8 @@
 				4ADCCBB615790D760022990C /* ViewController.xib */,
 				4ADCCBC615790DEC0022990C /* SocketIO.h */,
 				4ADCCBC715790DEC0022990C /* SocketIO.m */,
+				C9E391A015E2A1B00004693A /* SocketIOJSONSerialization.h */,
+				C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */,
 				4ADCCBA815790D760022990C /* Supporting Files */,
 			);
 			path = SocketTesterARC;
@@ -301,6 +306,7 @@
 				4A4453811589EE9100B44ABB /* base64.c in Sources */,
 				4A4453821589EE9100B44ABB /* NSData+SRB64Additions.m in Sources */,
 				4A4453831589EE9100B44ABB /* SRWebSocket.m in Sources */,
+				C9E391A215E2A1B00004693A /* SocketIOJSONSerialization.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

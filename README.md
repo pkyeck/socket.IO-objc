@@ -7,7 +7,11 @@
    * [SocketRocket](https://github.com/square/SocketRocket)  
   Look [here](https://github.com/square/SocketRocket#installing-ios) for further instructions how to use/install SocketRocket.
 
-   * [json-framework](https://github.com/stig/json-framework/)
+   * [json-framework](https://github.com/stig/json-framework/) (optional)
+   * [JSONKit](https://github.com/johnezang/JSONKit/) (optional)
+
+  JSON serialization can be provided by SBJson (json-framework), JSONKit or by Foundation in OS X 10.7/iOS 5.0.  These are selected
+  at runtime and introduce no source-level dependencies.
 
 ## Non-ARC version
 

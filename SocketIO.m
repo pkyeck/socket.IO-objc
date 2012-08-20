@@ -21,9 +21,9 @@
 //
 
 #import "SocketIO.h"
+#import "SocketIOJSONSerialization.h"
 
 #import "SRWebSocket.h"
-#import "SBJson.h"
 
 #define DEBUG_LOGS 1
 #define DEBUG_CERTIFICATE 1
@@ -41,7 +41,8 @@ static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@";
 static NSString* kInsecureXHRPortURL = @"http://%@:%d/socket.io/1/xhr-polling/%@";
 static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@";
 
-NSString* const SocketIOError = @"SocketIOError";
+NSString* const SocketIOError     = @"SocketIOError";
+NSString* const SocketIOException = @"SocketIOException";
 
 # pragma mark -
 # pragma mark SocketIO's private interface
@@ -66,7 +67,6 @@ NSString* const SocketIOError = @"SocketIOError";
 - (void) removeAcknowledgeForKey:(NSString *)key;
 
 @end
-
 
 # pragma mark -
 # pragma mark SocketIO implementation
@@ -175,7 +175,7 @@ NSString* const SocketIOError = @"SocketIOError";
 - (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"json"];
-    packet.data = [data JSONRepresentation];
+    packet.data = [SocketIOJSONSerialization JSONStringFromObject:data error:nil];
     packet.pId = [self addAcknowledge:function];
     [self send:packet];
 }
@@ -195,7 +195,7 @@ NSString* const SocketIOError = @"SocketIOError";
     }
     
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"event"];
-    packet.data = [dict JSONRepresentation];
+    packet.data = [SocketIOJSONSerialization JSONStringFromObject:dict error:nil];
     packet.pId = [self addAcknowledge:function];
     if (function) {
         packet.ack = @"data";
@@ -206,7 +206,7 @@ NSString* const SocketIOError = @"SocketIOError";
 - (void) sendAcknowledgement:(NSString *)pId withArgs:(NSArray *)data 
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"ack"];
-    packet.data = [data JSONRepresentation];
+    packet.data = [SocketIOJSONSerialization JSONStringFromObject:data error:nil];
     packet.pId = pId;
     packet.ack = @"data";
 
@@ -415,7 +415,7 @@ NSString* const SocketIOError = @"SocketIOError";
                     NSString *argsStr = [piece objectAtIndex:3];
                     id argsData = nil;
                     if (argsStr && ![argsStr isEqualToString:@""]) {
-                        argsData = [argsStr JSONValue];
+                        argsData = [SocketIOJSONSerialization objectFromJSONData:[argsStr dataUsingEncoding:NSUTF8StringEncoding] error:nil];
                         if ([argsData count] > 0) {
                             argsData = [argsData objectAtIndex:0];
                         }
@@ -805,7 +805,7 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 
 - (id) dataAsJSON
 {
-    return [self.data JSONValue];
+    return [SocketIOJSONSerialization objectFromJSONData:[[self data] dataUsingEncoding:NSUTF8StringEncoding] error:nil];
 }
 
 - (NSNumber *) typeAsNumber
