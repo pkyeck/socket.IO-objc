@@ -154,15 +154,15 @@ NSString* const SocketIOException = @"SocketIOException";
     [self sendDisconnect];
 }
 
-- (void) sendMessage:(NSString *)data
+- (void) sendMessage:(NSString *)message
 {
-    [self sendMessage:data withAcknowledge:nil];
+    [self sendMessage:message withAcknowledge:nil];
 }
 
-- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function
+- (void) sendMessage:(NSString *)message withAcknowledge:(SocketIOCallback)function
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"message"];
-    packet.data = data;
+    packet.data = message;
     packet.pId = [self addAcknowledge:function];
     [self send:packet];
 }
@@ -177,6 +177,29 @@ NSString* const SocketIOException = @"SocketIOException";
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"json"];
     packet.data = [SocketIOJSONSerialization JSONStringFromObject:data error:nil];
     packet.pId = [self addAcknowledge:function];
+    [self send:packet];
+}
+
+- (void) sendEvent:(NSString *)eventName withMessage:(NSString *)message
+{
+    [self sendEvent:eventName withMessage:message andAcknowledge:nil];
+}
+
+- (void) sendEvent:(NSString *)eventName withMessage:(NSString *)message andAcknowledge:(SocketIOCallback)function
+{
+    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:eventName forKey:@"name"];
+    
+    // do not require arguments
+    if (message != nil) {
+        [dict setObject:message forKey:@"args"];
+    }
+    
+    SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"event"];
+    packet.data = [dict JSONRepresentation];
+    packet.pId  = [self addAcknowledge:function];
+    if (function) {
+        packet.ack = @"data";
+    }
     [self send:packet];
 }
 
