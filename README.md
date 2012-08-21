@@ -7,11 +7,10 @@
    * [SocketRocket](https://github.com/square/SocketRocket)  
   Look [here](https://github.com/square/SocketRocket#installing-ios) for further instructions how to use/install SocketRocket.
 
+  JSON serialization can be provided by SBJson (json-framework), JSONKit or by Foundation in OS X 10.7/iOS 5.0.  These are selected at runtime and introduce no source-level dependencies.
    * [json-framework](https://github.com/stig/json-framework/) (optional)
    * [JSONKit](https://github.com/johnezang/JSONKit/) (optional)
 
-  JSON serialization can be provided by SBJson (json-framework), JSONKit or by Foundation in OS X 10.7/iOS 5.0.  These are selected
-  at runtime and introduce no source-level dependencies.
 
 ## Non-ARC version
 
@@ -27,7 +26,10 @@
 
   If required, additional parameters can be included in the handshake by adding an `NSDictionary` to the `withParams` option:
 
-    [socketIO connectToHost:@"localhost" onPort:3000 withParams:[NSDictionary dictionaryWithObjectsAndKeys:@"1234","auth_token",nil]];
+    [socketIO connectToHost:@"localhost"
+                     onPort:3000 
+                 withParams:[NSDictionary dictionaryWithObjectsAndKeys:@"1234", "auth_token", nil]
+    ];
 
   A namespace can also be defined in the connection details:
 
@@ -36,11 +38,11 @@
   There are different methods to send data to the server 
 
     - (void) sendMessage:(NSString *)data;
-	- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
-	- (void) sendJSON:(NSDictionary *)data;
-	- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function;
-	- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data;
-	- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SocketIOCallback)function;
+    - (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
+    - (void) sendJSON:(NSDictionary *)data;
+    - (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function;
+    - (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data;
+    - (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SocketIOCallback)function;
 	
   So you could send a normal Message like this
 
@@ -49,36 +51,36 @@
   or an Event (including some data) like this
 
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-	[dict setObject:@"test1" forKey:@"key1"];
-	[dict setObject:@"test2" forKey:@"key2"];
+    [dict setObject:@"test1" forKey:@"key1"];
+    [dict setObject:@"test2" forKey:@"key2"];
 	
-	[socketIO sendEvent:@"welcome" withData:dict];
+    [socketIO sendEvent:@"welcome" withData:dict];
 	
   If you want the server to acknowledge your Message/Event you would also pass a SocketIOCallback block
 	
-	SocketIOCallback cb = ^(id argsData) {
-		NSDictionary *response = argsData;
-		// do something with response
-	};
-	[socketIO sendEvent:@"welcomeAck" withData:dict andAcknowledge:cb];
+    SocketIOCallback cb = ^(id argsData) {
+        NSDictionary *response = argsData;
+        // do something with response
+    };
+    [socketIO sendEvent:@"welcomeAck" withData:dict andAcknowledge:cb];
 	
   All delegate methods are optional - you could implement the following
 
     - (void) socketIODidConnect:(SocketIO *)socket;
-	- (void) socketIODidDisconnect:(SocketIO *)socket;
-	- (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
-	- (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
-	- (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
-	- (void) socketIO:(SocketIO *)socket didSendMessage:(SocketIOPacket *)packet;
-	- (void) socketIOHandshakeFailed:(SocketIO *)socket;
-	- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error;
+    - (void) socketIODidDisconnect:(SocketIO *)socket;
+    - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
+    - (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
+    - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
+    - (void) socketIO:(SocketIO *)socket didSendMessage:(SocketIOPacket *)packet;
+    - (void) socketIOHandshakeFailed:(SocketIO *)socket;
+    - (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error;
 
   To process an incoming Message just
 
     - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet
-	{
-	    NSLog(@"didReceiveMessage() >>> data: %@", packet.data);
-	}
+    {
+        NSLog(@"didReceiveMessage() >>> data: %@", packet.data);
+    }
 
 ## Authors
 
