@@ -87,10 +87,12 @@ typedef enum {
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint;
 - (void) disconnect;
 
-- (void) sendMessage:(NSString *)data;
-- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
+- (void) sendMessage:(NSString *)message;
+- (void) sendMessage:(NSString *)message withAcknowledge:(SocketIOCallback)function;
 - (void) sendJSON:(NSDictionary *)data;
 - (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function;
+- (void) sendEvent:(NSString *)eventName withMessage:(NSString *)message;
+- (void) sendEvent:(NSString *)eventName withMessage:(NSString *)message andAcknowledge:(SocketIOCallback)function;
 - (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data;
 - (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SocketIOCallback)function;
 - (void) sendAcknowledgement:(NSString*)pId withArgs:(NSArray *)data;
