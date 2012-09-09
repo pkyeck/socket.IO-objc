@@ -629,8 +629,20 @@ NSString* const SocketIOException = @"SocketIOException";
     [self log:[NSString stringWithFormat:@"requestFinished() %@", responseString]];
     NSArray *data = [responseString componentsSeparatedByString:@":"];
     
+    BOOL connectionFailed = NO;
+    
     _sid = [data objectAtIndex:0];
-    if ([_sid length] < 1 || [data count] < 3) {
+    if ([_sid length] < 1 || [data count] < 3)
+        connectionFailed = YES;
+    else {
+        [self log:[NSString stringWithFormat:@"sid: %@", _sid]];
+        NSString *regex = @"[^0-9]";
+        NSPredicate *regexTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+        if ([_sid rangeOfString:@"error"].location != NSNotFound || ![regexTest evaluateWithObject:_sid])
+            connectionFailed = YES;
+    }
+        
+    if (connectionFailed) {
         // did not receive valid data, possibly missing a useSecure?
         
         if ([_delegate respondsToSelector:@selector(socketIO:failedToConnectWithError:)]) {
@@ -646,14 +658,6 @@ NSString* const SocketIOException = @"SocketIOException";
         // make sure to do call all cleanup code
         [self onDisconnect];
         
-        return;
-    }
-
-    [self log:[NSString stringWithFormat:@"sid: %@", _sid]];
-    NSString *regex = @"[^0-9]";
-    NSPredicate *regexTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
-    if ([_sid rangeOfString:@"error"].location != NSNotFound || [regexTest evaluateWithObject:_sid]) {
-        [self connectToHost:_host onPort:_port withParams:_params withNamespace:_endpoint];
         return;
     }
     
