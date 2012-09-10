@@ -629,8 +629,21 @@ NSString* const SocketIOException = @"SocketIOException";
     [self log:[NSString stringWithFormat:@"requestFinished() %@", responseString]];
     NSArray *data = [responseString componentsSeparatedByString:@":"];
     
+    BOOL connectionFailed = NO;
+    
     _sid = [data objectAtIndex:0];
-    if ([_sid length] < 1 || [data count] < 3) {
+    // make sure the response string is not garbage
+    if ([_sid length] < 1 || [data count] < 4)
+        connectionFailed = YES;
+    else {
+        NSScanner *hbTimeout = [NSScanner scannerWithString:[data objectAtIndex:1]];
+        NSScanner *connTimeout = [NSScanner scannerWithString:[data objectAtIndex:2]];
+        if (![hbTimeout scanFloat:NULL] || ![hbTimeout isAtEnd] ||
+            ![connTimeout scanFloat:NULL] || ![connTimeout isAtEnd])
+            connectionFailed = YES;
+    }
+        
+    if (connectionFailed) {
         // did not receive valid data, possibly missing a useSecure?
         
         if ([_delegate respondsToSelector:@selector(socketIO:failedToConnectWithError:)]) {
