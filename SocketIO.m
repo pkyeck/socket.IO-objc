@@ -632,13 +632,14 @@ NSString* const SocketIOException = @"SocketIOException";
     BOOL connectionFailed = NO;
     
     _sid = [data objectAtIndex:0];
-    if ([_sid length] < 1 || [data count] < 3)
+    // make sure the response string is not garbage
+    if ([_sid length] < 1 || [data count] < 4)
         connectionFailed = YES;
     else {
-        [self log:[NSString stringWithFormat:@"sid: %@", _sid]];
-        NSString *regex = @"[^0-9]";
-        NSPredicate *regexTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
-        if ([_sid rangeOfString:@"error"].location != NSNotFound || ![regexTest evaluateWithObject:_sid])
+        NSScanner *hbTimeout = [NSScanner scannerWithString:[data objectAtIndex:1]];
+        NSScanner *connTimeout = [NSScanner scannerWithString:[data objectAtIndex:2]];
+        if (![hbTimeout scanFloat:NULL] || ![hbTimeout isAtEnd] ||
+            ![connTimeout scanFloat:NULL] || ![connTimeout isAtEnd])
             connectionFailed = YES;
     }
         
@@ -658,6 +659,14 @@ NSString* const SocketIOException = @"SocketIOException";
         // make sure to do call all cleanup code
         [self onDisconnect];
         
+        return;
+    }
+
+    [self log:[NSString stringWithFormat:@"sid: %@", _sid]];
+    NSString *regex = @"[^0-9]";
+    NSPredicate *regexTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+    if ([_sid rangeOfString:@"error"].location != NSNotFound || [regexTest evaluateWithObject:_sid]) {
+        [self connectToHost:_host onPort:_port withParams:_params withNamespace:_endpoint];
         return;
     }
     
