@@ -1,6 +1,6 @@
 //
 //  SocketIO.m
-//  v0.22 ARC
+//  v0.23 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -180,12 +180,12 @@ NSString* const SocketIOException = @"SocketIOException";
     [self send:packet];
 }
 
-- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data
+- (void) sendEvent:(NSString *)eventName withData:(id)data
 {
     [self sendEvent:eventName withData:data andAcknowledge:nil];
 }
 
-- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SocketIOCallback)function
+- (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:eventName forKey:@"name"];
 
@@ -602,6 +602,25 @@ NSString* const SocketIOException = @"SocketIOException";
 # pragma mark Handshake callbacks (NSURLConnectionDataDelegate)
 - (void) connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response 
 {
+    // check for server status code (http://gigliwood.com/weblog/Cocoa/Q__When_is_an_conne.html)
+    if ([response respondsToSelector:@selector(statusCode)]) {
+        int statusCode = [((NSHTTPURLResponse *)response) statusCode];
+        [self log:[NSString stringWithFormat:@"didReceiveResponse() %i", statusCode]];
+        
+        if (statusCode >= 400) {
+            // stop connecting; no more delegate messages
+            [connection cancel];
+            
+            NSString *error = [NSString stringWithFormat:NSLocalizedString(@"Server returned status code %d", @""), statusCode];
+            NSDictionary *errorInfo = [NSDictionary dictionaryWithObject:error forKey:NSLocalizedDescriptionKey];
+            NSError *statusError = [NSError errorWithDomain:SocketIOError
+                                                       code:statusCode
+                                                   userInfo:errorInfo];
+            // call error callback manually
+            [self connection:connection didFailWithError:statusError];
+        }
+    }
+    
     [_httpRequestData setLength:0];
 }
 
@@ -626,13 +645,50 @@ NSString* const SocketIOException = @"SocketIOException";
 { 	
  	NSString *responseString = [[NSString alloc] initWithData:_httpRequestData encoding:NSASCIIStringEncoding];
 
-    [self log:[NSString stringWithFormat:@"requestFinished() %@", responseString]];
+    [self log:[NSString stringWithFormat:@"connectionDidFinishLoading() %@", responseString]];
     NSArray *data = [responseString componentsSeparatedByString:@":"];
+    // should be SID : heartbeat timeout : connection timeout : supported transports
+    
+    // check each returned value (thanks for the input https://github.com/taiyangc)
+    BOOL connectionFailed = false;
     
     _sid = [data objectAtIndex:0];
-    if ([_sid length] < 1 || [data count] < 3) {
+    if ([_sid length] < 1 || [data count] < 4) {
         // did not receive valid data, possibly missing a useSecure?
-        
+        connectionFailed = true;
+    }
+
+    // check SID
+    [self log:[NSString stringWithFormat:@"sid: %@", _sid]];
+    NSString *regex = @"[^0-9]";
+    NSPredicate *regexTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+    if ([_sid rangeOfString:@"error"].location != NSNotFound || [regexTest evaluateWithObject:_sid]) {
+        [self connectToHost:_host onPort:_port withParams:_params withNamespace:_endpoint];
+        return;
+    }
+    
+    // check heartbeat timeout
+    _heartbeatTimeout = [[data objectAtIndex:1] floatValue];
+    if (_heartbeatTimeout == 0.0) {
+        // couldn't find float value -> fail
+        connectionFailed = true;
+    }
+    else {
+        // add small buffer of 7sec (magic xD)
+        _heartbeatTimeout += 7.0;
+    }
+    [self log:[NSString stringWithFormat:@"heartbeatTimeout: %f", _heartbeatTimeout]];
+    
+    // index 2 => connection timeout
+    
+    // get transports
+    NSString *t = [data objectAtIndex:3];
+    NSArray *transports = [t componentsSeparatedByString:@","];
+    [self log:[NSString stringWithFormat:@"transports: %@", transports]];
+    // TODO: check which transports are supported by the server
+    
+    // if connection didn't return the values we need -> fail
+    if (connectionFailed) {
         if ([_delegate respondsToSelector:@selector(socketIO:failedToConnectWithError:)]) {
             NSError* error;
             
@@ -648,26 +704,6 @@ NSString* const SocketIOException = @"SocketIOException";
         
         return;
     }
-
-    [self log:[NSString stringWithFormat:@"sid: %@", _sid]];
-    NSString *regex = @"[^0-9]";
-    NSPredicate *regexTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
-    if ([_sid rangeOfString:@"error"].location != NSNotFound || [regexTest evaluateWithObject:_sid]) {
-        [self connectToHost:_host onPort:_port withParams:_params withNamespace:_endpoint];
-        return;
-    }
-    
-    // add small buffer of 7sec (magic xD)
-    _heartbeatTimeout = [[data objectAtIndex:1] floatValue] + 7.0;
-    [self log:[NSString stringWithFormat:@"heartbeatTimeout: %f", _heartbeatTimeout]];
-    
-    // index 2 => connection timeout
-    
-    NSString *t = [data objectAtIndex:3];
-    NSArray *transports = [t componentsSeparatedByString:@","];
-    [self log:[NSString stringWithFormat:@"transports: %@", transports]];
-    
-    // TODO: check which transports are supported by the server
     
     // if websocket
     [self openSocket];
