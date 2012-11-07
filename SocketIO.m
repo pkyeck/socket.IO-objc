@@ -841,7 +841,12 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 
 - (id) dataAsJSON
 {
-    return [SocketIOJSONSerialization objectFromJSONData:[[self data] dataUsingEncoding:NSUTF8StringEncoding] error:nil];
+    if([self data]) {
+        return [SocketIOJSONSerialization objectFromJSONData:[[self data] dataUsingEncoding:NSUTF8StringEncoding] error:nil];
+    }
+    else {
+        return nil;
+    }
 }
 
 - (NSNumber *) typeAsNumber
