@@ -1,6 +1,6 @@
 //
 //  SocketIO.m
-//  v0.23 ARC
+//  v0.2.4 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -65,6 +65,7 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (NSString *) addAcknowledge:(SocketIOCallback)function;
 - (void) removeAcknowledgeForKey:(NSString *)key;
+- (NSMutableArray*) getMatchesFrom:(NSString*)data with:(NSString*)regex;
 
 @end
 
@@ -841,8 +842,9 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 
 - (id) dataAsJSON
 {
-    if([self data]) {
-        return [SocketIOJSONSerialization objectFromJSONData:[[self data] dataUsingEncoding:NSUTF8StringEncoding] error:nil];
+    if (self.data) {
+        NSData *utf8Data = [self.data dataUsingEncoding:NSUTF8StringEncoding];
+        return [SocketIOJSONSerialization objectFromJSONData:utf8Data error:nil];
     }
     else {
         return nil;
