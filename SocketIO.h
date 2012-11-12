@@ -31,13 +31,16 @@ typedef void(^SocketIOCallback)(id argsData);
 extern NSString* const SocketIOError;
 
 typedef enum {
-    SocketIOServerRespondedWithInvalidConnectionData = -1
+    SocketIOServerRespondedWithInvalidConnectionData = -1 ,
+    SocketIOServerRespondedWithDisconnect = -2 ,
+    SocketIOHeartbeatTimeout = -3 ,
+    SocketIOWebSocketClosed = -4
 } SocketIOErrorCodes;
 
 @protocol SocketIODelegate <NSObject>
 @optional
 - (void) socketIODidConnect:(SocketIO *)socket;
-- (void) socketIODidDisconnect:(SocketIO *)socket;
+- (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error;
 - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
