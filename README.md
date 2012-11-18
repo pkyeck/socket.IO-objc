@@ -67,7 +67,7 @@
   All delegate methods are optional - you could implement the following
 
     - (void) socketIODidConnect:(SocketIO *)socket;
-    - (void) socketIODidDisconnect:(SocketIO *)socket;
+    - (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error;
     - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
     - (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
     - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
