@@ -523,9 +523,14 @@ NSString* const SocketIOException = @"SocketIOException";
         [_webSocket close];
     }
     
-    if ((wasConnected || wasConnecting)
-        && [_delegate respondsToSelector:@selector(socketIODidDisconnect:disconnectedWithError:)]) {
-        [_delegate socketIODidDisconnect:self disconnectedWithError:error];
+    if (wasConnected || wasConnecting) {
+        // Both delegates are called for backwards compatibility
+        if ([_delegate respondsToSelector:@selector(socketIODidDisconnect:)]) {
+            [_delegate socketIODidDisconnect:self];
+        }
+        if ([_delegate respondsToSelector:@selector(socketIODidDisconnect:disconnectedWithError:)]) {
+            [_delegate socketIODidDisconnect:self disconnectedWithError:error];
+        }
     }
 }
 
