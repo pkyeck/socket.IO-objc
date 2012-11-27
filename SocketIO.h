@@ -1,6 +1,6 @@
 //
 //  SocketIO.h
-//  v0.2.4 ARC
+//  v0.2.5 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -18,6 +18,7 @@
 //  Updated by 
 //    samlown   https://github.com/samlown
 //    kayleg    https://github.com/kayleg
+//    taiyangc  https://github.com/taiyangc
 //
 
 #import <Foundation/Foundation.h>
@@ -31,13 +32,17 @@ typedef void(^SocketIOCallback)(id argsData);
 extern NSString* const SocketIOError;
 
 typedef enum {
-    SocketIOServerRespondedWithInvalidConnectionData = -1
+    SocketIOServerRespondedWithInvalidConnectionData = -1,
+    SocketIOServerRespondedWithDisconnect = -2,
+    SocketIOHeartbeatTimeout = -3,
+    SocketIOWebSocketClosed = -4
 } SocketIOErrorCodes;
 
 @protocol SocketIODelegate <NSObject>
 @optional
 - (void) socketIODidConnect:(SocketIO *)socket;
-- (void) socketIODidDisconnect:(SocketIO *)socket;
+- (void) socketIODidDisconnect:(SocketIO *)socket __attribute__((deprecated));
+- (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error;
 - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;

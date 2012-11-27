@@ -67,7 +67,8 @@
   All delegate methods are optional - you could implement the following
 
     - (void) socketIODidConnect:(SocketIO *)socket;
-    - (void) socketIODidDisconnect:(SocketIO *)socket;
+    - (void) socketIODidDisconnect:(SocketIO *)socket; // deprecated
+    - (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error;
     - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
     - (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
     - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
@@ -84,9 +85,10 @@
 
 ## Authors
 
-Initial project by Philipp Kyeck <http://beta-interactive.de>.
-Namespace support by Sam Lown <sam@cabify.com> at Cabify.
-SSL support by kayleg <https://github.com/kayleg>.
+Initial project by Philipp Kyeck <http://beta-interactive.de>.  
+Namespace support by Sam Lown <sam@cabify.com> at Cabify.  
+SSL support by kayleg <https://github.com/kayleg>.  
+Different Socket Libraries + Error Handling by taiyangc <https://github.com/taiyangc>.
 
 ## License
 

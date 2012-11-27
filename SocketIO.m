@@ -1,6 +1,6 @@
 //
 //  SocketIO.m
-//  v0.2.4 ARC
+//  v0.2.5 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -18,6 +18,7 @@
 //  Updated by 
 //    samlown   https://github.com/samlown
 //    kayleg    https://github.com/kayleg
+//    taiyangc  https://github.com/taiyangc
 //
 
 #import "SocketIO.h"
@@ -61,7 +62,7 @@ NSString* const SocketIOException = @"SocketIOException";
 - (void) onTimeout;
 
 - (void) onConnect:(SocketIOPacket *)packet;
-- (void) onDisconnect;
+- (void) onDisconnect:(NSError *)error;
 
 - (void) sendDisconnect;
 - (void) sendHearbeat;
@@ -361,7 +362,9 @@ NSString* const SocketIOException = @"SocketIOException";
         switch (idx) {
             case 0: {
                 DEBUGLOG(@"disconnect");
-                [self onDisconnect];
+                [self onDisconnect:[NSError errorWithDomain:SocketIOError
+                                                       code:SocketIOServerRespondedWithDisconnect
+                                                   userInfo:nil]];
                 break;
             }
             case 1: {
@@ -500,7 +503,7 @@ NSString* const SocketIOException = @"SocketIOException";
     [self setTimeout];
 }
 
-- (void) onDisconnect 
+- (void) onDisconnect:(NSError *)error
 {
     DEBUGLOG(@"onDisconnect()");
     BOOL wasConnected = _isConnected;
@@ -525,9 +528,14 @@ NSString* const SocketIOException = @"SocketIOException";
         [_webSocket close];
     }
     
-    if ((wasConnected || wasConnecting)
-        && [_delegate respondsToSelector:@selector(socketIODidDisconnect:)]) {
-        [_delegate socketIODidDisconnect:self];
+    if ((wasConnected || wasConnecting)) {
+        // first look for the new disconnectedWithError then the old one (backwards compatibility)
+        if ([_delegate respondsToSelector:@selector(socketIODidDisconnect:disconnectedWithError:)]) {
+            [_delegate socketIODidDisconnect:self disconnectedWithError:error];
+        }
+        else if ([_delegate respondsToSelector:@selector(socketIODidDisconnect:)]) {
+            [_delegate socketIODidDisconnect:self];
+        }
     }
 }
 
@@ -556,7 +564,9 @@ NSString* const SocketIOException = @"SocketIOException";
 - (void) onTimeout 
 {
     DEBUGLOG(@"Timed out waiting for heartbeat.");
-    [self onDisconnect];
+    [self onDisconnect:[NSError errorWithDomain:SocketIOError
+                                           code:SocketIOHeartbeatTimeout
+                                       userInfo:nil]];
 }
 
 - (void) setTimeout 
@@ -694,18 +704,18 @@ NSString* const SocketIOException = @"SocketIOException";
     
     // if connection didn't return the values we need -> fail
     if (connectionFailed) {
+        NSError* error;
+
+        error = [NSError errorWithDomain:SocketIOError
+                                    code:SocketIOServerRespondedWithInvalidConnectionData
+                                userInfo:nil];
+
         if ([_delegate respondsToSelector:@selector(socketIO:failedToConnectWithError:)]) {
-            NSError* error;
-            
-            error = [NSError errorWithDomain:SocketIOError
-                                        code:SocketIOServerRespondedWithInvalidConnectionData
-                                    userInfo:nil];
-            
             [_delegate socketIO:self failedToConnectWithError:error];
         }
         
         // make sure to do call all cleanup code
-        [self onDisconnect];
+        [self onDisconnect:error];
         
         return;
     }
@@ -757,9 +767,9 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 
 - (void) webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error
 {
-    NSLog(@"ERROR: Socket failed with error ... %@", [error localizedDescription]);
+    DEBUGLOG(@"Socket failed with error ... %@", [error localizedDescription]);
     // Assuming this resulted in a disconnect
-    [self onDisconnect];
+    [self onDisconnect:error];
 }
 
 - (void) webSocket:(SRWebSocket *)webSocket 
@@ -768,7 +778,9 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
           wasClean:(BOOL)wasClean
 {
     DEBUGLOG(@"Socket closed.");
-    [self onDisconnect];
+    [self onDisconnect:[NSError errorWithDomain:SocketIOError
+                                           code:SocketIOWebSocketClosed
+                                       userInfo:nil]];
 }
 
 
