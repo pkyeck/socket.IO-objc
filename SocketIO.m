@@ -683,7 +683,11 @@ NSString* const SocketIOException = @"SocketIOException";
     }
     
     // check heartbeat timeout
-    _heartbeatTimeout = [[data objectAtIndex:1] floatValue];
+    if ([data count]< 1) {
+        _heartbeatTimeout = 0.0;
+    } else {
+        _heartbeatTimeout = [[data objectAtIndex:1] floatValue];
+    }
     if (_heartbeatTimeout == 0.0) {
         // couldn't find float value -> fail
         connectionFailed = true;
