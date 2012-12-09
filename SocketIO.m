@@ -683,7 +683,12 @@ NSString* const SocketIOException = @"SocketIOException";
     }
     
     // check heartbeat timeout
-    _heartbeatTimeout = [[data objectAtIndex:1] floatValue];
+    if ([data count] < 2) {
+        _heartbeatTimeout = 0.0;
+    } else {
+        _heartbeatTimeout = [[data objectAtIndex:1] floatValue];
+    }
+
     if (_heartbeatTimeout == 0.0) {
         // couldn't find float value -> fail
         connectionFailed = true;
@@ -697,10 +702,12 @@ NSString* const SocketIOException = @"SocketIOException";
     // index 2 => connection timeout
     
     // get transports
-    NSString *t = [data objectAtIndex:3];
-    NSArray *transports = [t componentsSeparatedByString:@","];
-    DEBUGLOG(@"transports: %@", transports);
-    // TODO: check which transports are supported by the server
+    if ([data count] > 3) {
+        NSString *t = [data objectAtIndex:3];
+        NSArray *transports = [t componentsSeparatedByString:@","];
+        DEBUGLOG(@"transports: %@", transports);
+        // TODO: check which transports are supported by the server
+    }
     
     // if connection didn't return the values we need -> fail
     if (connectionFailed) {
