@@ -1,6 +1,6 @@
 //
 //  SocketIO.h
-//  v0.2.5 ARC
+//  v0.3.0 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -99,34 +99,5 @@ typedef enum {
 - (void) sendEvent:(NSString *)eventName withData:(id)data;
 - (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function;
 - (void) sendAcknowledgement:(NSString*)pId withArgs:(NSArray *)data;
-
-@end
-
-
-@interface SocketIOPacket : NSObject
-{
-    NSString *type;
-    NSString *pId;
-    NSString *ack;
-    NSString *name;
-    NSString *data;
-    NSArray *args;
-    NSString *endpoint;
-    NSArray *_types;
-}
-
-@property (nonatomic, copy) NSString *type;
-@property (nonatomic, copy) NSString *pId;
-@property (nonatomic, copy) NSString *ack;
-@property (nonatomic, copy) NSString *name;
-@property (nonatomic, copy) NSString *data;
-@property (nonatomic, copy) NSString *endpoint;
-@property (nonatomic, copy) NSArray *args;
-
-- (id) initWithType:(NSString *)packetType;
-- (id) initWithTypeIndex:(int)index;
-- (id) dataAsJSON;
-- (NSNumber *) typeAsNumber;
-- (NSString *) typeForIndex:(int)index;
 
 @end
