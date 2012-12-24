@@ -25,6 +25,8 @@
 		4A4453821589EE9100B44ABB /* NSData+SRB64Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A44537D1589EE9100B44ABB /* NSData+SRB64Additions.m */; };
 		4A4453831589EE9100B44ABB /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A4453801589EE9100B44ABB /* SRWebSocket.m */; };
 		4AD96DF41680853E00D9E42D /* SocketIOPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AD96DF31680853E00D9E42D /* SocketIOPacket.m */; };
+		4AD96DF816808B7900D9E42D /* SocketIOTransportWebsocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AD96DF716808B7900D9E42D /* SocketIOTransportWebsocket.m */; };
+		4AD96DFC16822DE300D9E42D /* SocketIOTransportXHR.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AD96DFB16822DE300D9E42D /* SocketIOTransportXHR.m */; };
 		4ADCCBA215790D760022990C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBA115790D760022990C /* UIKit.framework */; };
 		4ADCCBA415790D760022990C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBA315790D760022990C /* Foundation.framework */; };
 		4ADCCBA615790D760022990C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBA515790D760022990C /* CoreGraphics.framework */; };
@@ -77,6 +79,11 @@
 		4A4453801589EE9100B44ABB /* SRWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRWebSocket.m; path = "submodules/socket-rocket/SocketRocket/SRWebSocket.m"; sourceTree = SOURCE_ROOT; };
 		4AD96DF21680853E00D9E42D /* SocketIOPacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOPacket.h; sourceTree = SOURCE_ROOT; };
 		4AD96DF31680853E00D9E42D /* SocketIOPacket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOPacket.m; sourceTree = SOURCE_ROOT; };
+		4AD96DF616808B7900D9E42D /* SocketIOTransportWebsocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SocketIOTransportWebsocket.h; path = ../SocketIOTransportWebsocket.h; sourceTree = "<group>"; };
+		4AD96DF716808B7900D9E42D /* SocketIOTransportWebsocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SocketIOTransportWebsocket.m; path = ../SocketIOTransportWebsocket.m; sourceTree = "<group>"; };
+		4AD96DF9168225FC00D9E42D /* SocketIOTransport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SocketIOTransport.h; sourceTree = SOURCE_ROOT; };
+		4AD96DFA16822DE300D9E42D /* SocketIOTransportXHR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOTransportXHR.h; sourceTree = SOURCE_ROOT; };
+		4AD96DFB16822DE300D9E42D /* SocketIOTransportXHR.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOTransportXHR.m; sourceTree = SOURCE_ROOT; };
 		4ADCCB9D15790D760022990C /* SocketTesterARC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SocketTesterARC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4ADCCBA115790D760022990C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		4ADCCBA315790D760022990C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -213,6 +220,11 @@
 				4AD96DF31680853E00D9E42D /* SocketIOPacket.m */,
 				C9E391A015E2A1B00004693A /* SocketIOJSONSerialization.h */,
 				C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */,
+				4AD96DF9168225FC00D9E42D /* SocketIOTransport.h */,
+				4AD96DF616808B7900D9E42D /* SocketIOTransportWebsocket.h */,
+				4AD96DF716808B7900D9E42D /* SocketIOTransportWebsocket.m */,
+				4AD96DFA16822DE300D9E42D /* SocketIOTransportXHR.h */,
+				4AD96DFB16822DE300D9E42D /* SocketIOTransportXHR.m */,
 				4ADCCBA815790D760022990C /* Supporting Files */,
 			);
 			path = SocketTesterARC;
@@ -313,6 +325,8 @@
 				4A4453831589EE9100B44ABB /* SRWebSocket.m in Sources */,
 				C9E391A215E2A1B00004693A /* SocketIOJSONSerialization.m in Sources */,
 				4AD96DF41680853E00D9E42D /* SocketIOPacket.m in Sources */,
+				4AD96DF816808B7900D9E42D /* SocketIOTransportWebsocket.m in Sources */,
+				4AD96DFC16822DE300D9E42D /* SocketIOTransportXHR.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

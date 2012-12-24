@@ -1,8 +1,8 @@
-# Socket.IO / Objective C Library  (ARC version)
+# Socket.IO / Objective C Library (ARC version)
 
   Interface to communicate between Objective C and [Socket.IO](http://socket.io/)
-  with the help of websockets. It's based on fpotter's [socketio-cocoa](https://github.com/fpotter/socketio-cocoa)
-  and uses other libraries/classes like
+  with the help of websockets or [Long-Polling](http://en.wikipedia.org/wiki/Push_technology#Long_polling). Originally based on fpotter's [socketio-cocoa](https://github.com/fpotter/socketio-cocoa)
+  it uses other libraries/classes like
 
    * [SocketRocket](https://github.com/square/SocketRocket)
   Look [here](https://github.com/square/SocketRocket#installing-ios) for further instructions how to use/install SocketRocket.
@@ -73,6 +73,11 @@
     - (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
     - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
     - (void) socketIO:(SocketIO *)socket didSendMessage:(SocketIOPacket *)packet;
+    - (void) socketIO:(SocketIO *)socket onError:(NSError *)error;
+
+  These two callbacks are deprecated - please don't use them anymore - they will
+  be removed in upcoming releases:
+
     - (void) socketIOHandshakeFailed:(SocketIO *)socket;
     - (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error;
 
@@ -85,9 +90,9 @@
 
 ## Authors
 
-Initial project by Philipp Kyeck <http://beta-interactive.de>.  
-Namespace support by Sam Lown <sam@cabify.com> at Cabify.  
-SSL support by kayleg <https://github.com/kayleg>.  
+Initial project by Philipp Kyeck <http://beta-interactive.de>.
+Namespace support by Sam Lown <sam@cabify.com> at Cabify.
+SSL support by kayleg <https://github.com/kayleg>.
 Different Socket Libraries + Error Handling by taiyangc <https://github.com/taiyangc>.
 
 ## License

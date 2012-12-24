@@ -1,5 +1,5 @@
 //
-//  SocketIOJSONSerialization
+//  SocketIOJSONSerialization.m
 //  v0.3.0 ARC
 //
 //  based on
