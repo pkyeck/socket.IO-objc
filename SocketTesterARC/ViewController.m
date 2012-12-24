@@ -50,5 +50,10 @@
     [socketIO sendMessage:@"hello back!" withAcknowledge:cb];
 }
 
+- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error
+{
+    NSLog(@"failedToConnectWithError() %@", error);
+}
+
 
 @end

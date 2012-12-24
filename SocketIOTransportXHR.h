@@ -1,5 +1,5 @@
 //
-//  SocketIOJSONSerialization.h
+//  SocketIOTransportXHR.h
 //  v0.3.0 ARC
 //
 //  based on
@@ -23,9 +23,15 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SocketIOJSONSerialization : NSObject
+#import "SocketIOTransport.h"
 
-+ (id) objectFromJSONData:(NSData *)data error:(NSError **)error;
-+ (NSString *) JSONStringFromObject:(id)object error:(NSError **)error;
+@interface SocketIOTransportXHR : NSObject <SocketIOTransport, NSURLConnectionDelegate>
+{
+    NSString *_url;
+    NSMutableData *_data;
+    NSMutableDictionary *_polls;
+}
+
+@property (nonatomic, unsafe_unretained) id <SocketIOTransportDelegate> delegate;
 
 @end

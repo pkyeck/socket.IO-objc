@@ -1,5 +1,5 @@
 //
-//  SocketIOJSONSerialization.h
+//  SocketIOTransportWebsocket.h
 //  v0.3.0 ARC
 //
 //  based on
@@ -23,9 +23,14 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SocketIOJSONSerialization : NSObject
+#import "SRWebSocket.h"
+#import "SocketIOTransport.h"
 
-+ (id) objectFromJSONData:(NSData *)data error:(NSError **)error;
-+ (NSString *) JSONStringFromObject:(id)object error:(NSError **)error;
+@interface SocketIOTransportWebsocket : NSObject <SocketIOTransport, SRWebSocketDelegate>
+{
+    SRWebSocket *_webSocket;
+}
+
+@property (nonatomic, unsafe_unretained) id <SocketIOTransportDelegate> delegate;
 
 @end

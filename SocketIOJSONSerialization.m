@@ -1,6 +1,6 @@
 //
-//  SocketIO.m
-//  v0.22 ARC
+//  SocketIOJSONSerialization.m
+//  v0.3.0 ARC
 //
 //  based on
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -18,6 +18,7 @@
 //  Updated by
 //    samlown   https://github.com/samlown
 //    kayleg    https://github.com/kayleg
+//    taiyangc  https://github.com/taiyangc
 //
 
 #import "SocketIOJSONSerialization.h"
