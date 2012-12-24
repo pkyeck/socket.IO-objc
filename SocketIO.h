@@ -23,7 +23,8 @@
 
 #import <Foundation/Foundation.h>
 
-@class SRWebSocket;
+#import "SocketIOTransport.h"
+
 @class SocketIO;
 @class SocketIOPacket;
 
@@ -35,24 +36,30 @@ typedef enum {
     SocketIOServerRespondedWithInvalidConnectionData = -1,
     SocketIOServerRespondedWithDisconnect = -2,
     SocketIOHeartbeatTimeout = -3,
-    SocketIOWebSocketClosed = -4
+    SocketIOWebSocketClosed = -4,
+    SocketIOTransportsNotSupported = -5,
+    SocketIOHandshakeFailed = -6,
+    SocketIODataCouldNotBeSend = -7
 } SocketIOErrorCodes;
+
 
 @protocol SocketIODelegate <NSObject>
 @optional
 - (void) socketIODidConnect:(SocketIO *)socket;
-- (void) socketIODidDisconnect:(SocketIO *)socket __attribute__((deprecated));
 - (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error;
 - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didSendMessage:(SocketIOPacket *)packet;
-- (void) socketIOHandshakeFailed:(SocketIO *)socket;
-- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error;
+- (void) socketIO:(SocketIO *)socket onError:(NSError *)error;
+
+// TODO: deprecated -> to be removed
+- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error __attribute__((deprecated));
+- (void) socketIOHandshakeFailed:(SocketIO *)socket __attribute__((deprecated));
 @end
 
 
-@interface SocketIO : NSObject <NSURLConnectionDelegate>
+@interface SocketIO : NSObject <NSURLConnectionDelegate, SocketIOTransportDelegate>
 {
     NSString *_host;
     NSInteger _port;
@@ -62,7 +69,7 @@ typedef enum {
     
     __unsafe_unretained id<SocketIODelegate> _delegate;
     
-    SRWebSocket *_webSocket;
+    NSObject <SocketIOTransport> *_transport;
     
     BOOL _isConnected;
     BOOL _isConnecting;
@@ -79,11 +86,15 @@ typedef enum {
     NSInteger _ackCount;
     
     // http request
-    NSMutableData * _httpRequestData;
+    NSMutableData *_httpRequestData;
 }
 
-@property (nonatomic, readonly) BOOL isConnected, isConnecting;
+@property (nonatomic, readonly) NSString *host;
+@property (nonatomic, readonly) NSInteger port;
+@property (nonatomic, readonly) NSString *sid;
+@property (nonatomic, readonly) NSTimeInterval heartbeatTimeout;
 @property (nonatomic) BOOL useSecure;
+@property (nonatomic, readonly) BOOL isConnected, isConnecting;
 @property (nonatomic, unsafe_unretained) id<SocketIODelegate> delegate;
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate;
