@@ -14,99 +14,99 @@
 
 ## Non-ARC version
 
-  If you're old school - there's still the [non-ARC version](https://github.com/pkyeck/socket.IO-objc/tree/non-arc) for you.
-  This version (the non-ARC one) is out-of-date and won't be maintained any further (at least not by me).
+If you're old school - there's still the [non-ARC version](https://github.com/pkyeck/socket.IO-objc/tree/non-arc) for you.
+This version (the non-ARC one) is out-of-date and won't be maintained any further (at least not by me).
 
 ## Usage
 
-  The easiest way to connect to your Socket.IO / node.js server is
+The easiest way to connect to your Socket.IO / node.js server is
 
-  ``` objective-c
-  SocketIO *socketIO = [[SocketIO alloc] initWithDelegate:self];
-  [socketIO connectToHost:@"localhost" onPort:3000];
-	```
+``` objective-c
+SocketIO *socketIO = [[SocketIO alloc] initWithDelegate:self];
+[socketIO connectToHost:@"localhost" onPort:3000];
+```
 
-  If required, additional parameters can be included in the handshake by adding an `NSDictionary` to the `withParams` option:
+If required, additional parameters can be included in the handshake by adding an `NSDictionary` to the `withParams` option:
 
-	``` objective-c
-  [socketIO connectToHost:@"localhost"
-                   onPort:3000
-               withParams:[NSDictionary dictionaryWithObjectsAndKeys:@"1234", @"auth_token", nil]
-  ];
-	```
-	
-  A namespace can also be defined in the connection details:
+``` objective-c
+[socketIO connectToHost:@"localhost"
+                 onPort:3000
+             withParams:[NSDictionary dictionaryWithObjectsAndKeys:@"1234", @"auth_token", nil]
+];
+```
 
-	``` objective-c
-  [socketIO connectToHost:@"localhost" onPort:3000 withParams:nil withNamespace:@"/users"];
-	```
-	
-  There are different methods to send data to the server
+A namespace can also be defined in the connection details:
 
-	``` objective-c
-  - (void) sendMessage:(NSString *)data;
-	- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
-  - (void) sendJSON:(NSDictionary *)data;
-  - (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function;
-  - (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data;
-  - (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SocketIOCallback)function;
-	```
-	
-  So you could send a normal Message like this
+``` objective-c
+[socketIO connectToHost:@"localhost" onPort:3000 withParams:nil withNamespace:@"/users"];
+```
 
-	``` objective-c
-  [socketIO sendMessage:@"hello world"];
-	```
-	
-  or an Event (including some data) like this
+There are different methods to send data to the server
 
-	``` objective-c
-  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-	[dict setObject:@"test1" forKey:@"key1"];
-  [dict setObject:@"test2" forKey:@"key2"];
+``` objective-c
+- (void) sendMessage:(NSString *)data;
+- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
+- (void) sendJSON:(NSDictionary *)data;
+- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function;
+- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data;
+- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SocketIOCallback)function;
+```
 
-  [socketIO sendEvent:@"welcome" withData:dict];
-	```
-	
-  If you want the server to acknowledge your Message/Event you would also pass a SocketIOCallback block
+So you could send a normal Message like this
 
-  ``` objective-c
-  SocketIOCallback cb = ^(id argsData) {
-      NSDictionary *response = argsData;
-      // do something with response
-  };
-  [socketIO sendEvent:@"welcomeAck" withData:dict andAcknowledge:cb];
-	```
-	
-  All delegate methods are optional - you could implement the following
+``` objective-c
+[socketIO sendMessage:@"hello world"];
+```
 
-	``` objective-c
-  - (void) socketIODidConnect:(SocketIO *)socket;
-  - (void) socketIODidDisconnect:(SocketIO *)socket; // deprecated
-  - (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error;
-  - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
-  - (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
-  - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
-  - (void) socketIO:(SocketIO *)socket didSendMessage:(SocketIOPacket *)packet;
-  - (void) socketIO:(SocketIO *)socket onError:(NSError *)error;
-	```
-	
-  These two callbacks are deprecated - please don't use them anymore - they will
-  be removed in upcoming releases:
+or an Event (including some data) like this
 
-	``` objective-c
-  - (void) socketIOHandshakeFailed:(SocketIO *)socket;
-  - (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error;
-	```
+``` objective-c
+NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+[dict setObject:@"test1" forKey:@"key1"];
+[dict setObject:@"test2" forKey:@"key2"];
 
-  To process an incoming Message just
+[socketIO sendEvent:@"welcome" withData:dict];
+```
 
-	``` objective-c
-  - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet
-  {
-      NSLog(@"didReceiveMessage() >>> data: %@", packet.data);
-  }
-	```
+If you want the server to acknowledge your Message/Event you would also pass a SocketIOCallback block
+
+``` objective-c
+SocketIOCallback cb = ^(id argsData) {
+    NSDictionary *response = argsData;
+    // do something with response
+};
+[socketIO sendEvent:@"welcomeAck" withData:dict andAcknowledge:cb];
+```
+
+All delegate methods are optional - you could implement the following
+
+``` objective-c
+- (void) socketIODidConnect:(SocketIO *)socket;
+- (void) socketIODidDisconnect:(SocketIO *)socket; // deprecated
+- (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error;
+- (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
+- (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
+- (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
+- (void) socketIO:(SocketIO *)socket didSendMessage:(SocketIOPacket *)packet;
+- (void) socketIO:(SocketIO *)socket onError:(NSError *)error;
+```
+
+These two callbacks are deprecated - please don't use them anymore - they will
+be removed in upcoming releases:
+
+``` objective-c
+- (void) socketIOHandshakeFailed:(SocketIO *)socket;
+- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error;
+```
+
+To process an incoming Message just
+
+``` objective-c
+- (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet
+{
+    NSLog(@"didReceiveMessage() >>> data: %@", packet.data);
+}
+```
 	
 ## Authors
 
