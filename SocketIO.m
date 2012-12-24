@@ -635,56 +635,57 @@ NSString* const SocketIOException = @"SocketIOException";
     
     // check each returned value (thanks for the input https://github.com/taiyangc)
     BOOL connectionFailed = false;
+    NSError* error;
     
     _sid = [data objectAtIndex:0];
     if ([_sid length] < 1 || [data count] < 4) {
         // did not receive valid data, possibly missing a useSecure?
         connectionFailed = true;
     }
-
-    // check SID
-    DEBUGLOG(@"sid: %@", _sid);
-    NSString *regex = @"[^0-9]";
-    NSPredicate *regexTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
-    if ([_sid rangeOfString:@"error"].location != NSNotFound || [regexTest evaluateWithObject:_sid]) {
-        [self connectToHost:_host onPort:_port withParams:_params withNamespace:_endpoint];
-        return;
-    }
-    
-    // check heartbeat timeout
-    _heartbeatTimeout = [[data objectAtIndex:1] floatValue];
-    if (_heartbeatTimeout == 0.0) {
-        // couldn't find float value -> fail
-        connectionFailed = true;
-    }
     else {
-        // add small buffer of 7sec (magic xD)
-        _heartbeatTimeout += 7.0;
-    }
-    DEBUGLOG(@"heartbeatTimeout: %f", _heartbeatTimeout);
-    
-    // index 2 => connection timeout
-    
-    // get transports
-    NSString *t = [data objectAtIndex:3];
-    NSArray *transports = [t componentsSeparatedByString:@","];
-    DEBUGLOG(@"transports: %@", transports);
-    
-    NSError* error;
-    if ([transports indexOfObject:@"websocket"] != NSNotFound) {
-        DEBUGLOG(@"websocket supported -> using it now");
-        _transport = [[SocketIOTransportWebsocket alloc] initWithDelegate:self];
-    }
-    else if ([transports indexOfObject:@"xhr-polling"] != NSNotFound) {
-        DEBUGLOG(@"xhr polling supported -> using it now");
-        _transport = [[SocketIOTransportXHR alloc] initWithDelegate:self];
-    }
-    else {
-        DEBUGLOG(@"no transport found that is supported :( -> fail");
-        connectionFailed = true;
-        error = [NSError errorWithDomain:SocketIOError
-                                    code:SocketIOTransportsNotSupported
-                                userInfo:nil];
+        // check SID
+        DEBUGLOG(@"sid: %@", _sid);
+        NSString *regex = @"[^0-9]";
+        NSPredicate *regexTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+        if ([_sid rangeOfString:@"error"].location != NSNotFound || [regexTest evaluateWithObject:_sid]) {
+            [self connectToHost:_host onPort:_port withParams:_params withNamespace:_endpoint];
+            return;
+        }
+        
+        // check heartbeat timeout
+        _heartbeatTimeout = [[data objectAtIndex:1] floatValue];
+        if (_heartbeatTimeout == 0.0) {
+            // couldn't find float value -> fail
+            connectionFailed = true;
+        }
+        else {
+            // add small buffer of 7sec (magic xD)
+            _heartbeatTimeout += 7.0;
+        }
+        DEBUGLOG(@"heartbeatTimeout: %f", _heartbeatTimeout);
+        
+        // index 2 => connection timeout
+        
+        // get transports
+        NSString *t = [data objectAtIndex:3];
+        NSArray *transports = [t componentsSeparatedByString:@","];
+        DEBUGLOG(@"transports: %@", transports);
+        
+        if ([transports indexOfObject:@"websocket"] != NSNotFound) {
+            DEBUGLOG(@"websocket supported -> using it now");
+            _transport = [[SocketIOTransportWebsocket alloc] initWithDelegate:self];
+        }
+        else if ([transports indexOfObject:@"xhr-polling"] != NSNotFound) {
+            DEBUGLOG(@"xhr polling supported -> using it now");
+            _transport = [[SocketIOTransportXHR alloc] initWithDelegate:self];
+        }
+        else {
+            DEBUGLOG(@"no transport found that is supported :( -> fail");
+            connectionFailed = true;
+            error = [NSError errorWithDomain:SocketIOError
+                                        code:SocketIOTransportsNotSupported
+                                    userInfo:nil];
+        }
     }
     
     // if connection didn't return the values we need -> fail
