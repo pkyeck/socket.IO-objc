@@ -75,6 +75,8 @@ typedef enum {
     BOOL _isConnecting;
     BOOL _useSecure;
     
+    NSURLConnection *_handshake;
+    
     // heartbeat
     NSTimeInterval _heartbeatTimeout;
     NSTimer *_timeout;
