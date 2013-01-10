@@ -77,6 +77,10 @@ static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@";
     [_webSocket open];
 }
 
+- (void)dealloc {
+    [_webSocket setDelegate:NULL];
+}
+
 - (void) close
 {
     [_webSocket close];
