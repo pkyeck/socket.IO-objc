@@ -1,6 +1,6 @@
 //
 //  SocketIOTransportWebsocket.m
-//  v0.3.0 ARC
+//  v0.3.2 ARC
 //
 //  based on
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -77,8 +77,9 @@ static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@";
     [_webSocket open];
 }
 
-- (void)dealloc {
-    [_webSocket setDelegate:NULL];
+- (void) dealloc
+{
+    [_webSocket setDelegate:nil];
 }
 
 - (void) close
