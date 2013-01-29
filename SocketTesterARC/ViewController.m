@@ -14,7 +14,7 @@
 
 @implementation ViewController
 
-- (void)viewDidLoad
+- (void) viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
@@ -24,13 +24,13 @@
     [socketIO connectToHost:@"localhost" onPort:3000];
 }
 
-- (void)viewDidUnload
+- (void) viewDidUnload
 {
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+- (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
 }
@@ -48,6 +48,11 @@
         NSLog(@"ack arrived: %@", response);
     };
     [socketIO sendMessage:@"hello back!" withAcknowledge:cb];
+}
+
+- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error
+{
+    NSLog(@"failedToConnectWithError() %@", error);
 }
 
 

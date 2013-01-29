@@ -1,6 +1,6 @@
 //
 //  SocketIO.h
-//  v0.22 ARC
+//  v0.3.2 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -18,11 +18,13 @@
 //  Updated by 
 //    samlown   https://github.com/samlown
 //    kayleg    https://github.com/kayleg
+//    taiyangc  https://github.com/taiyangc
 //
 
 #import <Foundation/Foundation.h>
 
-@class SRWebSocket;
+#import "SocketIOTransport.h"
+
 @class SocketIO;
 @class SocketIOPacket;
 
@@ -31,23 +33,33 @@ typedef void(^SocketIOCallback)(id argsData);
 extern NSString* const SocketIOError;
 
 typedef enum {
-    SocketIOServerRespondedWithInvalidConnectionData = -1
+    SocketIOServerRespondedWithInvalidConnectionData = -1,
+    SocketIOServerRespondedWithDisconnect = -2,
+    SocketIOHeartbeatTimeout = -3,
+    SocketIOWebSocketClosed = -4,
+    SocketIOTransportsNotSupported = -5,
+    SocketIOHandshakeFailed = -6,
+    SocketIODataCouldNotBeSend = -7
 } SocketIOErrorCodes;
+
 
 @protocol SocketIODelegate <NSObject>
 @optional
 - (void) socketIODidConnect:(SocketIO *)socket;
-- (void) socketIODidDisconnect:(SocketIO *)socket;
+- (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error;
 - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didSendMessage:(SocketIOPacket *)packet;
-- (void) socketIOHandshakeFailed:(SocketIO *)socket;
-- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error;
+- (void) socketIO:(SocketIO *)socket onError:(NSError *)error;
+
+// TODO: deprecated -> to be removed
+- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error __attribute__((deprecated));
+- (void) socketIOHandshakeFailed:(SocketIO *)socket __attribute__((deprecated));
 @end
 
 
-@interface SocketIO : NSObject <NSURLConnectionDelegate>
+@interface SocketIO : NSObject <NSURLConnectionDelegate, SocketIOTransportDelegate>
 {
     NSString *_host;
     NSInteger _port;
@@ -57,11 +69,13 @@ typedef enum {
     
     __unsafe_unretained id<SocketIODelegate> _delegate;
     
-    SRWebSocket *_webSocket;
+    NSObject <SocketIOTransport> *_transport;
     
     BOOL _isConnected;
     BOOL _isConnecting;
     BOOL _useSecure;
+    
+    NSURLConnection *_handshake;
     
     // heartbeat
     NSTimeInterval _heartbeatTimeout;
@@ -74,11 +88,15 @@ typedef enum {
     NSInteger _ackCount;
     
     // http request
-    NSMutableData * _httpRequestData;
+    NSMutableData *_httpRequestData;
 }
 
-@property (nonatomic, readonly) BOOL isConnected, isConnecting;
+@property (nonatomic, readonly) NSString *host;
+@property (nonatomic, readonly) NSInteger port;
+@property (nonatomic, readonly) NSString *sid;
+@property (nonatomic, readonly) NSTimeInterval heartbeatTimeout;
 @property (nonatomic) BOOL useSecure;
+@property (nonatomic, readonly) BOOL isConnected, isConnecting;
 @property (nonatomic, unsafe_unretained) id<SocketIODelegate> delegate;
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate;
@@ -91,37 +109,8 @@ typedef enum {
 - (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
 - (void) sendJSON:(NSDictionary *)data;
 - (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function;
-- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data;
-- (void) sendEvent:(NSString *)eventName withData:(NSDictionary *)data andAcknowledge:(SocketIOCallback)function;
+- (void) sendEvent:(NSString *)eventName withData:(id)data;
+- (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function;
 - (void) sendAcknowledgement:(NSString*)pId withArgs:(NSArray *)data;
-
-@end
-
-
-@interface SocketIOPacket : NSObject
-{
-    NSString *type;
-    NSString *pId;
-    NSString *ack;
-    NSString *name;
-    NSString *data;
-    NSArray *args;
-    NSString *endpoint;
-    NSArray *_types;
-}
-
-@property (nonatomic, copy) NSString *type;
-@property (nonatomic, copy) NSString *pId;
-@property (nonatomic, copy) NSString *ack;
-@property (nonatomic, copy) NSString *name;
-@property (nonatomic, copy) NSString *data;
-@property (nonatomic, copy) NSString *endpoint;
-@property (nonatomic, copy) NSArray *args;
-
-- (id) initWithType:(NSString *)packetType;
-- (id) initWithTypeIndex:(int)index;
-- (id) dataAsJSON;
-- (NSNumber *) typeAsNumber;
-- (NSString *) typeForIndex:(int)index;
 
 @end
