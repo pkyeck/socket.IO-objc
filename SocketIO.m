@@ -626,7 +626,10 @@ NSString* const SocketIOException = @"SocketIOException";
     }
     // TODO: deprecated - to be removed
     else if ([_delegate respondsToSelector:@selector(socketIOHandshakeFailed:)]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         [_delegate socketIOHandshakeFailed:self];
+#pragma clang diagnostic pop
     }
 }
 
@@ -707,7 +710,10 @@ NSString* const SocketIOException = @"SocketIOException";
         }
         // TODO: deprecated - to be removed
         else if ([_delegate respondsToSelector:@selector(socketIO:failedToConnectWithError:)]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
             [_delegate socketIO:self failedToConnectWithError:error];
+#pragma clang diagnostic pop
         }
         
         // make sure to do call all cleanup code
