@@ -75,6 +75,8 @@ typedef enum {
     BOOL _isConnecting;
     BOOL _useSecure;
     
+    NSString* _resource;
+    
     NSURLConnection *_handshake;
     
     // heartbeat
@@ -96,6 +98,7 @@ typedef enum {
 @property (nonatomic, readonly) NSString *sid;
 @property (nonatomic, readonly) NSTimeInterval heartbeatTimeout;
 @property (nonatomic) BOOL useSecure;
+@property (nonatomic, copy) NSString* resource;
 @property (nonatomic, readonly) BOOL isConnected, isConnecting;
 @property (nonatomic, unsafe_unretained) id<SocketIODelegate> delegate;
 

@@ -75,7 +75,8 @@ NSString* const SocketIOException = @"SocketIOException";
 
 @synthesize isConnected = _isConnected, 
             isConnecting = _isConnecting, 
-            useSecure = _useSecure, 
+            useSecure = _useSecure,
+            resource = _resource,
             delegate = _delegate,
             heartbeatTimeout = _heartbeatTimeout;
 
@@ -128,6 +129,10 @@ NSString* const SocketIOException = @"SocketIOException";
             format = _useSecure ? kSecureHandshakeURL : kInsecureHandshakeURL;
             s = [NSString stringWithFormat:format, _host, rand(), query];
         }
+        if (_resource != nil) {
+            s = [s stringByReplacingOccurrencesOfString:@"socket.io" withString:_resource];
+        }
+        
         DEBUGLOG(@"Connecting to socket with URL: %@", s);
         NSURL *url = [NSURL URLWithString:s];
         query = nil;
