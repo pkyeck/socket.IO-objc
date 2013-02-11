@@ -583,7 +583,7 @@ NSString* const SocketIOException = @"SocketIOException";
 {
     // check for server status code (http://gigliwood.com/weblog/Cocoa/Q__When_is_an_conne.html)
     if ([response respondsToSelector:@selector(statusCode)]) {
-        int statusCode = [((NSHTTPURLResponse *)response) statusCode];
+        NSInteger statusCode = [((NSHTTPURLResponse *)response) statusCode];
         DEBUGLOG(@"didReceiveResponse() %i", statusCode);
         
         if (statusCode >= 400) {
