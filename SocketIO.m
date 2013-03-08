@@ -500,9 +500,6 @@ NSString* const SocketIOException = @"SocketIOException";
                     id argsData = nil;
                     if (argsStr && ![argsStr isEqualToString:@""]) {
                         argsData = [SocketIOJSONSerialization objectFromJSONData:[argsStr dataUsingEncoding:NSUTF8StringEncoding] error:nil];
-                        if ([argsData count] > 0) {
-                            argsData = [argsData objectAtIndex:0];
-                        }
                     }
                     
                     // get selector for ackId
