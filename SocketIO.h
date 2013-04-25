@@ -1,6 +1,6 @@
 //
 //  SocketIO.h
-//  v0.3.2 ARC
+//  v0.3.3 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -89,6 +89,9 @@ typedef enum {
     
     // http request
     NSMutableData *_httpRequestData;
+    
+    // get all arguments from ack? (https://github.com/pkyeck/socket.IO-objc/pull/85)
+    BOOL _returnAllDataFromAck;
 }
 
 @property (nonatomic, readonly) NSString *host;
@@ -98,6 +101,7 @@ typedef enum {
 @property (nonatomic) BOOL useSecure;
 @property (nonatomic, readonly) BOOL isConnected, isConnecting;
 @property (nonatomic, unsafe_unretained) id<SocketIODelegate> delegate;
+@property (nonatomic) BOOL returnAllDataFromAck;
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port;

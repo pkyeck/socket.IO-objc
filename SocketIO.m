@@ -1,6 +1,6 @@
 //
 //  SocketIO.m
-//  v0.3.2 ARC
+//  v0.3.3 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -77,7 +77,8 @@ NSString* const SocketIOException = @"SocketIOException";
             isConnecting = _isConnecting, 
             useSecure = _useSecure, 
             delegate = _delegate,
-            heartbeatTimeout = _heartbeatTimeout;
+            heartbeatTimeout = _heartbeatTimeout,
+            returnAllDataFromAck = _returnAllDataFromAck;
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate
 {
@@ -87,6 +88,7 @@ NSString* const SocketIOException = @"SocketIOException";
         _queue = [[NSMutableArray alloc] init];
         _ackCount = 0;
         _acks = [[NSMutableDictionary alloc] init];
+        _returnAllDataFromAck = NO;
     }
     return self;
 }
@@ -503,7 +505,8 @@ NSString* const SocketIOException = @"SocketIOException";
                     id argsData = nil;
                     if (argsStr && ![argsStr isEqualToString:@""]) {
                         argsData = [SocketIOJSONSerialization objectFromJSONData:[argsStr dataUsingEncoding:NSUTF8StringEncoding] error:nil];
-                        if ([argsData count] > 0) {
+                        // either send complete response or only the first arg to callback
+                        if (!_returnAllDataFromAck && [argsData count] > 0) {
                             argsData = [argsData objectAtIndex:0];
                         }
                     }
@@ -670,7 +673,7 @@ NSString* const SocketIOException = @"SocketIOException";
             connectionFailed = true;
         }
         else {
-            // add small buffer of 7sec (magic xD)
+            // add small buffer of 7sec (magic xD) otherwise heartbeat will be too late and connection is closed
             _heartbeatTimeout += 7.0;
         }
         DEBUGLOG(@"heartbeatTimeout: %f", _heartbeatTimeout);
