@@ -364,7 +364,6 @@ NSString* const SocketIOException = @"SocketIOException";
 {
     DEBUGLOG(@"start/reset timeout");
     if (_timeout != nil) {
-        [_timeout invalidate];
         _timeout = nil;
     }
     
