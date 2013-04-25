@@ -202,13 +202,47 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
     }
 }
 
+// Sometimes Socket.IO "batches" up messages in one packet,
+// so we have to split them.
+//
+- (NSArray *)packetsFromPayload:(NSString *)payload
+{
+    // "Batched" format is:
+    // �[packet_0 length]�[packet_0]�[packet_1 length]�[packet_1]�[packet_n length]�[packet_n]
+    
+    if([payload hasPrefix:@"\ufffd"]) {
+        // Payload has multiple packets, split based on the '�' character
+        // Skip the first character, then split
+        NSArray *split = [[payload substringFromIndex:1] componentsSeparatedByString:@"\ufffd"];
+        
+        // Init array with [split count] / 2 because we only need the odd-numbered
+        NSMutableArray *packets = [NSMutableArray arrayWithCapacity:[split count]/2];
+
+        // Now all of the odd-numbered indices are the packets (1, 3, 5, etc.)
+        [split enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            if(idx % 2 != 0) {
+                [packets addObject:obj];
+            }
+        }];
+
+        NSLog(@"Parsed a payload!");
+        return packets;
+    } else {
+        // Regular single-packet payload
+        return @[payload];
+    }
+}
+
 - (void) connectionDidFinishLoading:(NSURLConnection *)connection
 {
     NSString *message = [[NSString alloc] initWithData:_data encoding:NSUTF8StringEncoding];
     DEBUGLOG(@"response: __%@__", message);
     
     if (![message isEqualToString:@"1"]) {
-        [delegate onData:message];
+        NSArray *messages = [self packetsFromPayload:message];
+        [messages enumerateObjectsUsingBlock:^(NSString *message, NSUInteger idx, BOOL *stop) {
+            [delegate onData:message];
+        }];
     }
     
     // remove current connection from pool
