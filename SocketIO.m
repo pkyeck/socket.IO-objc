@@ -138,8 +138,11 @@ NSString* const SocketIOException = @"SocketIOException";
                                                  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData 
                                              timeoutInterval:10.0];
         
-        _handshake = [NSURLConnection connectionWithRequest:request 
-                                                   delegate:self];
+        _handshake = [[NSURLConnection alloc] initWithRequest:request
+                                                     delegate:self startImmediately:NO];
+        [_handshake scheduleInRunLoop:[NSRunLoop mainRunLoop]
+                              forMode:NSDefaultRunLoopMode];
+        [_handshake start];
         if (_handshake) {
             _httpRequestData = [NSMutableData data];
         }
