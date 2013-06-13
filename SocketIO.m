@@ -248,7 +248,7 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) send:(SocketIOPacket *)packet
 {
-    if(![self isConnected]) {
+    if(![self isConnected] && ![self isConnecting]) {
         DEBUGLOG(@"Already disconnected!");
         return;
     }
