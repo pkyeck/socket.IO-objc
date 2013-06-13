@@ -231,6 +231,7 @@ NSString* const SocketIOException = @"SocketIOException";
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"disconnect"];
     [self send:packet];
+    [self onDisconnect:nil];
 }
 
 - (void) sendConnect
@@ -246,7 +247,11 @@ NSString* const SocketIOException = @"SocketIOException";
 }
 
 - (void) send:(SocketIOPacket *)packet
-{   
+{
+    if(![self isConnected] && ![self isConnecting]) {
+        DEBUGLOG(@"Already disconnected!");
+        return;
+    }
     DEBUGLOG(@"send()");
     NSNumber *type = [packet typeAsNumber];
     NSMutableArray *encoded = [NSMutableArray arrayWithObject:type];
