@@ -764,7 +764,7 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 
 - (void) dealloc
 {
-    _handshake.delegate = nil;
+    [_handshake cancel];
     _handshake = nil;
 
     _host = nil;
