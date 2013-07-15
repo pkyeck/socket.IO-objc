@@ -165,6 +165,25 @@ NSString* const SocketIOException = @"SocketIOException";
     }
 }
 
+- (void) disconnectForced
+{
+    NSString *protocol = [self useSecure] ? @"https" : @"http";
+    NSString *urlString = [NSString stringWithFormat:@"%@://%@:%i/socket.io/1/xhr-polling/%@?disconnect", protocol, _host, _port, _sid];
+    NSURL *url = [NSURL URLWithString:urlString];
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    NSError *error = nil;
+    NSHTTPURLResponse *response = nil;
+    
+    [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    
+    if(error || [response statusCode] != 200) {
+        DEBUGLOG(@"Error during disconnect: %@", error);
+    }
+    
+    [self onDisconnect:error];
+}
+
 - (void) sendMessage:(NSString *)data
 {
     [self sendMessage:data withAcknowledge:nil];
