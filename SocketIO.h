@@ -79,7 +79,7 @@ typedef enum {
     
     // heartbeat
     NSTimeInterval _heartbeatTimeout;
-    NSTimer *_timeout;
+    dispatch_source_t _timeout;
     
     NSMutableArray *_queue;
     

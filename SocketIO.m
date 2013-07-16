@@ -398,6 +398,11 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) onTimeout 
 {
+    if (_timeout) {
+        dispatch_source_cancel(_timeout);
+        _timeout = NULL;
+    }
+    
     DEBUGLOG(@"Timed out waiting for heartbeat.");
     [self onDisconnect:[NSError errorWithDomain:SocketIOError
                                            code:SocketIOHeartbeatTimeout
@@ -407,16 +412,29 @@ NSString* const SocketIOException = @"SocketIOException";
 - (void) setTimeout 
 {
     DEBUGLOG(@"start/reset timeout");
-    if (_timeout != nil) {
-        [_timeout invalidate];
-        _timeout = nil;
+    if (_timeout) {
+        dispatch_source_cancel(_timeout);
+        _timeout = NULL;
     }
     
-    _timeout = [NSTimer scheduledTimerWithTimeInterval:_heartbeatTimeout
-                                                target:self 
-                                              selector:@selector(onTimeout) 
-                                              userInfo:nil 
-                                               repeats:NO];
+    _timeout = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,
+                                      0,
+                                      0,
+                                      dispatch_get_main_queue());
+    
+    dispatch_source_set_timer(_timeout,
+                              dispatch_time(DISPATCH_TIME_NOW, _heartbeatTimeout * NSEC_PER_SEC),
+                              0,
+                              0);
+    
+    __weak SocketIO *weakSelf = self;
+    
+    dispatch_source_set_event_handler(_timeout, ^{
+        [weakSelf onTimeout];
+    });
+    
+    dispatch_resume(_timeout);
+    
 }
 
 
@@ -595,9 +613,9 @@ NSString* const SocketIOException = @"SocketIOException";
     [_queue removeAllObjects];
     
     // Kill the heartbeat timer
-    if (_timeout != nil) {
-        [_timeout invalidate];
-        _timeout = nil;
+    if (_timeout) {
+        dispatch_source_cancel(_timeout);
+        _timeout = NULL;
     }
     
     // Disconnect the websocket, just in case
@@ -811,8 +829,10 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
     _transport.delegate = nil;
     _transport = nil;
     
-    [_timeout invalidate];
-    _timeout = nil;
+    if (_timeout) {
+        dispatch_source_cancel(_timeout);
+        _timeout = NULL;
+    }
     
     _queue = nil;
     _acks = nil;
