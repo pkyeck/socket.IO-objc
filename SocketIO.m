@@ -41,6 +41,7 @@ static NSString* kInsecureHandshakeURL = @"http://%@/socket.io/1/?t=%d%@";
 static NSString* kInsecureHandshakePortURL = @"http://%@:%d/socket.io/1/?t=%d%@";
 static NSString* kSecureHandshakePortURL = @"https://%@:%d/socket.io/1/?t=%d%@";
 static NSString* kSecureHandshakeURL = @"https://%@/socket.io/1/?t=%d%@";
+static NSString* kForceDisconnectURL = @"%@://%@%@/socket.io/1/xhr-polling/%@?disconnect";
 
 float const defaultConnectionTimeout = 10.0f;
 
@@ -154,10 +155,8 @@ NSString* const SocketIOException = @"SocketIOException";
                                                  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData 
                                              timeoutInterval:connectionTimeout];
         
-        _handshake = [[NSURLConnection alloc] initWithRequest:request
-                                                     delegate:self startImmediately:NO];
-        [_handshake scheduleInRunLoop:[NSRunLoop mainRunLoop]
-                              forMode:NSDefaultRunLoopMode];
+        _handshake = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+        [_handshake scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
         [_handshake start];
         if (_handshake) {
             _httpRequestData = [NSMutableData data];
@@ -183,8 +182,10 @@ NSString* const SocketIOException = @"SocketIOException";
 - (void) disconnectForced
 {
     NSString *protocol = [self useSecure] ? @"https" : @"http";
-    NSString *urlString = [NSString stringWithFormat:@"%@://%@:%i/socket.io/1/xhr-polling/%@?disconnect", protocol, _host, _port, _sid];
+    NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
+    NSString *urlString = [NSString stringWithFormat:kForceDisconnectURL, protocol, _host, port, _sid];
     NSURL *url = [NSURL URLWithString:urlString];
+    DEBUGLOG(@"Force disconnect at: %@", urlString);
     
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     NSError *error = nil;
