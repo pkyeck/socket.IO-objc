@@ -162,6 +162,7 @@ NSString* const SocketIOException = @"SocketIOException";
     }
     else if (_isConnecting) {
         [_handshake cancel];
+        [self onDisconnect: nil];
     }
 }
 
@@ -786,10 +787,14 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 
 - (void) dealloc
 {
+    [_handshake cancel];
+    _handshake = nil;
+
     _host = nil;
     _sid = nil;
     _endpoint = nil;
     
+    _transport.delegate = nil;
     _transport = nil;
     
     [_timeout invalidate];
