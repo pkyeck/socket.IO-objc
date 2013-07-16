@@ -36,7 +36,10 @@
 }
 
 
-
+- (void) socketIODidConnect:(SocketIO *)socket
+{
+    NSLog(@"socket.io connected.");
+}
 
 - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet
 {
@@ -46,14 +49,24 @@
         NSDictionary *response = argsData;
         // do something with response
         NSLog(@"ack arrived: %@", response);
+        
+        // test forced disconnect
+        [socketIO disconnectForced];
     };
     [socketIO sendMessage:@"hello back!" withAcknowledge:cb];
 }
 
-- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error
+- (void) socketIO:(SocketIO *)socket onError:(NSError *)error
 {
-    NSLog(@"failedToConnectWithError() %@", error);
+    NSLog(@"onError() %@", error);
 }
+
+
+- (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error
+{
+    NSLog(@"socket.io disconnected. did error occur? %@", error);
+}
+
 
 
 @end
