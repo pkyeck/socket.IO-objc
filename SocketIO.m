@@ -42,6 +42,8 @@ static NSString* kInsecureHandshakePortURL = @"http://%@:%d/socket.io/1/?t=%d%@"
 static NSString* kSecureHandshakePortURL = @"https://%@:%d/socket.io/1/?t=%d%@";
 static NSString* kSecureHandshakeURL = @"https://%@/socket.io/1/?t=%d%@";
 
+float const defaultConnectionTimeout = 10.0f;
+
 NSString* const SocketIOError     = @"SocketIOError";
 NSString* const SocketIOException = @"SocketIOException";
 
@@ -95,15 +97,27 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port
 {
-    [self connectToHost:host onPort:port withParams:nil withNamespace:@""];
+    [self connectToHost:host onPort:port withParams:nil withNamespace:@"" withConnectionTimeout:defaultConnectionTimeout];
 }
 
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params
 {
-    [self connectToHost:host onPort:port withParams:params withNamespace:@""];
+    [self connectToHost:host onPort:port withParams:params withNamespace:@"" withConnectionTimeout:defaultConnectionTimeout];
 }
 
-- (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint
+- (void) connectToHost:(NSString *)host
+                onPort:(NSInteger)port
+            withParams:(NSDictionary *)params
+         withNamespace:(NSString *)endpoint
+{
+    [self connectToHost:host onPort:port withParams:params withNamespace:@"" withConnectionTimeout:defaultConnectionTimeout];
+}
+
+- (void) connectToHost:(NSString *)host
+                onPort:(NSInteger)port
+            withParams:(NSDictionary *)params
+         withNamespace:(NSString *)endpoint
+ withConnectionTimeout:(NSTimeInterval)connectionTimeout
 {
     if (!_isConnected && !_isConnecting) {
         _isConnecting = YES;
@@ -138,7 +152,7 @@ NSString* const SocketIOException = @"SocketIOException";
         // make a request
         NSURLRequest *request = [NSURLRequest requestWithURL:url
                                                  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData 
-                                             timeoutInterval:10.0];
+                                             timeoutInterval:connectionTimeout];
         
         _handshake = [[NSURLConnection alloc] initWithRequest:request
                                                      delegate:self startImmediately:NO];
@@ -178,7 +192,7 @@ NSString* const SocketIOException = @"SocketIOException";
     
     [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     
-    if(error || [response statusCode] != 200) {
+    if (error || [response statusCode] != 200) {
         DEBUGLOG(@"Error during disconnect: %@", error);
     }
     
@@ -268,7 +282,7 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) send:(SocketIOPacket *)packet
 {
-    if(![self isConnected] && ![self isConnecting]) {
+    if (![self isConnected] && ![self isConnecting]) {
         DEBUGLOG(@"Already disconnected!");
         return;
     }
