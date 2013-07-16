@@ -67,6 +67,12 @@ static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@";
         format = delegate.useSecure ? kSecureSocketURL : kInsecureSocketURL;
         urlStr = [NSString stringWithFormat:format, delegate.host, delegate.sid];
     }
+    
+    SocketIO* socketio = (SocketIO*)self.delegate;
+    if (socketio.resource != nil) {
+        urlStr = [urlStr stringByReplacingOccurrencesOfString:@"socket.io" withString:socketio.resource];
+    }
+    
     NSURL *url = [NSURL URLWithString:urlStr];
     
     _webSocket = nil;

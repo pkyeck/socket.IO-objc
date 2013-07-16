@@ -69,6 +69,12 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
         format = delegate.useSecure ? kSecureXHRURL : kInsecureXHRURL;
         _url = [NSString stringWithFormat:format, delegate.host, delegate.sid];
     }
+
+    SocketIO* socketio = (SocketIO*)self.delegate;
+    if (socketio.resource != nil) {
+        _url = [_url stringByReplacingOccurrencesOfString:@"socket.io" withString:socketio.resource];
+    }
+
     DEBUGLOG(@"Opening XHR @ %@", _url);
     [self poll:nil];
 }
