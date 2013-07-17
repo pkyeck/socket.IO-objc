@@ -37,11 +37,9 @@
 #define DEBUGLOG(...)
 #endif
 
-static NSString* kInsecureHandshakeURL = @"http://%@/socket.io/1/?t=%d%@";
-static NSString* kInsecureHandshakePortURL = @"http://%@:%d/socket.io/1/?t=%d%@";
-static NSString* kSecureHandshakePortURL = @"https://%@:%d/socket.io/1/?t=%d%@";
-static NSString* kSecureHandshakeURL = @"https://%@/socket.io/1/?t=%d%@";
-static NSString* kForceDisconnectURL = @"%@://%@%@/socket.io/1/xhr-polling/%@?disconnect";
+static NSString* kResourceName = @"socket.io";
+static NSString* kHandshakeURL = @"%@://%@%@/%@/1/?t=%d%@";
+static NSString* kForceDisconnectURL = @"%@://%@%@/%@/1/xhr-polling/%@?disconnect";
 
 float const defaultConnectionTimeout = 10.0f;
 
@@ -135,29 +133,22 @@ NSString* const SocketIOException = @"SocketIOException";
         }];
         
         // do handshake via HTTP request
-        NSString *s;
-        NSString *format;
-        if (_port) {
-            format = _useSecure ? kSecureHandshakePortURL : kInsecureHandshakePortURL;
-            s = [NSString stringWithFormat:format, _host, _port, rand(), query];
-        }
-        else {
-            format = _useSecure ? kSecureHandshakeURL : kInsecureHandshakeURL;
-            s = [NSString stringWithFormat:format, _host, rand(), query];
-        }
-        DEBUGLOG(@"Connecting to socket with URL: %@", s);
-        NSURL *url = [NSURL URLWithString:s];
-        query = nil;
+        NSString *protocol = _useSecure ? @"https" : @"http";
+        NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
+        NSString *handshakeUrl = [NSString stringWithFormat:kHandshakeURL, protocol, _host, port, kResourceName, rand(), query];
                 
+        DEBUGLOG(@"Connecting to socket with URL: %@", handshakeUrl);
+        query = nil;
         
         // make a request
-        NSURLRequest *request = [NSURLRequest requestWithURL:url
+        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:handshakeUrl]
                                                  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData 
                                              timeoutInterval:connectionTimeout];
         
         _handshake = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
         [_handshake scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
         [_handshake start];
+
         if (_handshake) {
             _httpRequestData = [NSMutableData data];
         }
@@ -183,7 +174,7 @@ NSString* const SocketIOException = @"SocketIOException";
 {
     NSString *protocol = [self useSecure] ? @"https" : @"http";
     NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
-    NSString *urlString = [NSString stringWithFormat:kForceDisconnectURL, protocol, _host, port, _sid];
+    NSString *urlString = [NSString stringWithFormat:kForceDisconnectURL, protocol, _host, port, kResourceName, _sid];
     NSURL *url = [NSURL URLWithString:urlString];
     DEBUGLOG(@"Force disconnect at: %@", urlString);
     
