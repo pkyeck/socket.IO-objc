@@ -120,4 +120,6 @@ typedef enum {
 - (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function;
 - (void) sendAcknowledgement:(NSString*)pId withArgs:(NSArray *)data;
 
+- (void) setResourceName:(NSString *)name;
+
 @end

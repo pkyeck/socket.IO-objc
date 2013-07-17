@@ -136,7 +136,7 @@ NSString* const SocketIOException = @"SocketIOException";
         NSString *protocol = _useSecure ? @"https" : @"http";
         NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
         NSString *handshakeUrl = [NSString stringWithFormat:kHandshakeURL, protocol, _host, port, kResourceName, rand(), query];
-                
+        
         DEBUGLOG(@"Connecting to socket with URL: %@", handshakeUrl);
         query = nil;
         
@@ -148,7 +148,7 @@ NSString* const SocketIOException = @"SocketIOException";
         _handshake = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
         [_handshake scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
         [_handshake start];
-
+        
         if (_handshake) {
             _httpRequestData = [NSMutableData data];
         }
@@ -248,6 +248,11 @@ NSString* const SocketIOException = @"SocketIOException";
     packet.ack = @"data";
 
     [self send:packet];
+}
+
+- (void) setResourceName:(NSString *)name
+{
+    kResourceName = [name copy];
 }
 
 # pragma mark -
