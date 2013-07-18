@@ -17,26 +17,28 @@
 - (void) viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
     
+    // create socket.io client instance
     socketIO = [[SocketIO alloc] initWithDelegate:self];
-    //socketIO.useSecure = YES;
+    
+    // you can update the resource name of the handshake URL
+    // see https://github.com/pkyeck/socket.IO-objc/pull/80
+    // [socketIO setResourceName:@"whatever"];
+    
+    // if you want to use https instead of http
+    // socketIO.useSecure = YES;
+    
+    // connect to the socket.io server that is running locally at port 3000
     [socketIO connectToHost:@"localhost" onPort:3000];
 }
 
-- (void) viewDidUnload
+# pragma mark -
+# pragma mark socket.IO-objc delegate methods
+
+- (void) socketIODidConnect:(SocketIO *)socket
 {
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
+    NSLog(@"socket.io connected.");
 }
-
-- (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
-}
-
-
-
 
 - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet
 {
@@ -46,13 +48,34 @@
         NSDictionary *response = argsData;
         // do something with response
         NSLog(@"ack arrived: %@", response);
+        
+        // test forced disconnect
+        [socketIO disconnectForced];
     };
     [socketIO sendMessage:@"hello back!" withAcknowledge:cb];
 }
 
-- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error
+- (void) socketIO:(SocketIO *)socket onError:(NSError *)error
 {
-    NSLog(@"failedToConnectWithError() %@", error);
+    NSLog(@"onError() %@", error);
+}
+
+
+- (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error
+{
+    NSLog(@"socket.io disconnected. did error occur? %@", error);
+}
+
+# pragma mark -
+
+- (void) viewDidUnload
+{
+    [super viewDidUnload];
+}
+
+- (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
 }
 
 
