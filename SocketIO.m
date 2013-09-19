@@ -1,6 +1,6 @@
 //
 //  SocketIO.m
-//  v0.4 ARC
+//  v0.4.0.1 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -109,7 +109,7 @@ NSString* const SocketIOException = @"SocketIOException";
             withParams:(NSDictionary *)params
          withNamespace:(NSString *)endpoint
 {
-    [self connectToHost:host onPort:port withParams:params withNamespace:@"" withConnectionTimeout:defaultConnectionTimeout];
+    [self connectToHost:host onPort:port withParams:params withNamespace:endpoint withConnectionTimeout:defaultConnectionTimeout];
 }
 
 - (void) connectToHost:(NSString *)host
