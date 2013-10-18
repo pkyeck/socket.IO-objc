@@ -83,6 +83,8 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
         [conn cancel];
     }
     [_polls removeAllObjects];
+    
+    closed = YES;
 }
 
 - (BOOL) isReady
@@ -101,6 +103,9 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
 
 - (void) checkAndStartPoll
 {
+    if (closed)
+        return;
+    
     BOOL restart = NO;
     // no polls currently running -> start one
     if ([_polls count] == 0) {

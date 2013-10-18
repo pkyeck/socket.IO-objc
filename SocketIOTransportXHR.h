@@ -30,6 +30,7 @@
     NSString *_url;
     NSMutableData *_data;
     NSMutableDictionary *_polls;
+    BOOL closed;
 }
 
 @property (nonatomic, unsafe_unretained) id <SocketIOTransportDelegate> delegate;
