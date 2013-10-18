@@ -45,7 +45,8 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
 
 @implementation SocketIOTransportXHR
 
-@synthesize delegate;
+@synthesize delegate,
+            isClosed = _isClosed;
 
 - (id) initWithDelegate:(id<SocketIOTransportDelegate>)delegate_
 {
@@ -83,6 +84,8 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
         [conn cancel];
     }
     [_polls removeAllObjects];
+    
+    _isClosed = YES;
 }
 
 - (BOOL) isReady
@@ -101,6 +104,10 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
 
 - (void) checkAndStartPoll
 {
+    if (_isClosed) {
+        return;
+    }
+    
     BOOL restart = NO;
     // no polls currently running -> start one
     if ([_polls count] == 0) {
