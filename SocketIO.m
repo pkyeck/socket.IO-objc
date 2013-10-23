@@ -324,7 +324,7 @@ NSString* const SocketIOException = @"SocketIOException";
         DEBUGLOG(@"send() >>> %@", req);
         [_transport send:req];
         
-        if ([_delegate respondsToSelector:@selector(socketIO:didSendMessage:)]) {
+        if (_delegate && [_delegate respondsToSelector:@selector(socketIO:didSendMessage:)]) {
             [_delegate socketIO:self didSendMessage:packet];
         }
     }
@@ -361,7 +361,7 @@ NSString* const SocketIOException = @"SocketIOException";
     
     _isConnecting = NO;
     
-    if ([_delegate respondsToSelector:@selector(socketIODidConnect:)]) {
+    if (_delegate && [_delegate respondsToSelector:@selector(socketIODidConnect:)]) {
         [_delegate socketIODidConnect:self];
     }
     
@@ -517,7 +517,7 @@ NSString* const SocketIOException = @"SocketIOException";
             case 3: {
                 DEBUGLOG(@"message");
                 if (packet.data && ![packet.data isEqualToString:@""]) {
-                    if ([_delegate respondsToSelector:@selector(socketIO:didReceiveMessage:)]) {
+                    if (_delegate && [_delegate respondsToSelector:@selector(socketIO:didReceiveMessage:)]) {
                         [_delegate socketIO:self didReceiveMessage:packet];
                     }
                 }
@@ -526,7 +526,7 @@ NSString* const SocketIOException = @"SocketIOException";
             case 4: {
                 DEBUGLOG(@"json");
                 if (packet.data && ![packet.data isEqualToString:@""]) {
-                    if ([_delegate respondsToSelector:@selector(socketIO:didReceiveJSON:)]) {
+                    if (_delegate && [_delegate respondsToSelector:@selector(socketIO:didReceiveJSON:)]) {
                         [_delegate socketIO:self didReceiveJSON:packet];
                     }
                 }
@@ -538,7 +538,7 @@ NSString* const SocketIOException = @"SocketIOException";
                     NSDictionary *json = [packet dataAsJSON];
                     packet.name = [json objectForKey:@"name"];
                     packet.args = [json objectForKey:@"args"];
-                    if ([_delegate respondsToSelector:@selector(socketIO:didReceiveEvent:)]) {
+                    if (_delegate && [_delegate respondsToSelector:@selector(socketIO:didReceiveEvent:)]) {
                         [_delegate socketIO:self didReceiveEvent:packet];
                     }
                 }
@@ -623,7 +623,7 @@ NSString* const SocketIOException = @"SocketIOException";
     }
     
     if ((wasConnected || wasConnecting)) {
-        if ([_delegate respondsToSelector:@selector(socketIODidDisconnect:disconnectedWithError:)]) {
+        if (_delegate && [_delegate respondsToSelector:@selector(socketIODidDisconnect:disconnectedWithError:)]) {
             [_delegate socketIODidDisconnect:self disconnectedWithError:error];
         }
     }
@@ -631,7 +631,7 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) onError:(NSError *)error
 {
-    if ([_delegate respondsToSelector:@selector(socketIO:onError:)]) {
+    if (_delegate && [_delegate respondsToSelector:@selector(socketIO:onError:)]) {
         [_delegate socketIO:self onError:error];
     }
 }
@@ -675,7 +675,7 @@ NSString* const SocketIOException = @"SocketIOException";
     _isConnected = NO;
     _isConnecting = NO;
     
-    if ([_delegate respondsToSelector:@selector(socketIO:onError:)]) {
+    if (_delegate && [_delegate respondsToSelector:@selector(socketIO:onError:)]) {
         NSMutableDictionary *errorInfo = [NSDictionary dictionaryWithObject:error forKey:NSLocalizedDescriptionKey];
         
         NSError *err = [NSError errorWithDomain:SocketIOError
@@ -685,7 +685,7 @@ NSString* const SocketIOException = @"SocketIOException";
         [_delegate socketIO:self onError:err];
     }
     // TODO: deprecated - to be removed
-    else if ([_delegate respondsToSelector:@selector(socketIOHandshakeFailed:)]) {
+    else if (_delegate && [_delegate respondsToSelector:@selector(socketIOHandshakeFailed:)]) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
         [_delegate socketIOHandshakeFailed:self];
@@ -765,11 +765,11 @@ NSString* const SocketIOException = @"SocketIOException";
                                     userInfo:nil];
         }
 
-        if ([_delegate respondsToSelector:@selector(socketIO:onError:)]) {
+        if (_delegate && [_delegate respondsToSelector:@selector(socketIO:onError:)]) {
             [_delegate socketIO:self onError:error];
         }
         // TODO: deprecated - to be removed
-        else if ([_delegate respondsToSelector:@selector(socketIO:failedToConnectWithError:)]) {
+        else if (_delegate && [_delegate respondsToSelector:@selector(socketIO:failedToConnectWithError:)]) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
             [_delegate socketIO:self failedToConnectWithError:error];

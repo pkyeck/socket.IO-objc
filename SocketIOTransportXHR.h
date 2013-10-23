@@ -32,6 +32,6 @@
     NSMutableDictionary *_polls;
 }
 
-@property (nonatomic, unsafe_unretained) id <SocketIOTransportDelegate> delegate;
+@property (nonatomic, weak) id <SocketIOTransportDelegate> delegate;
 
 @end
