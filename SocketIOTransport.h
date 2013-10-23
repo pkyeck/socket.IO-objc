@@ -45,6 +45,6 @@
 - (BOOL) isReady;
 - (void) send:(NSString *)request;
 
-@property (nonatomic, unsafe_unretained) id <SocketIOTransportDelegate> delegate;
+@property (nonatomic, weak) id <SocketIOTransportDelegate> delegate;
 
 @end

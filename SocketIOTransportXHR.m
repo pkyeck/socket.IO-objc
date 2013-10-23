@@ -240,9 +240,11 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
     
     if (![message isEqualToString:@"1"]) {
         NSArray *messages = [self packetsFromPayload:message];
-        [messages enumerateObjectsUsingBlock:^(NSString *message, NSUInteger idx, BOOL *stop) {
-            [delegate onData:message];
-        }];
+        if([delegate respondsToSelector:@selector(onData:)]) {
+            [messages enumerateObjectsUsingBlock:^(NSString *message, NSUInteger idx, BOOL *stop) {
+                [delegate onData:message];
+            }];
+        }
     }
     
     // remove current connection from pool
