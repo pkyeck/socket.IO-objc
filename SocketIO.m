@@ -38,7 +38,7 @@
 #endif
 
 static NSString* kResourceName = @"socket.io";
-static NSString* kHandshakeURL = @"%@://%@%@/%@/1/?t=%d%@";
+static NSString* kHandshakeURL = @"%@://%@%@/%@/1/?t=%.0f%@";
 static NSString* kForceDisconnectURL = @"%@://%@%@/%@/1/xhr-polling/%@?disconnect";
 
 float const defaultConnectionTimeout = 10.0f;
@@ -135,6 +135,8 @@ NSString* const SocketIOException = @"SocketIOException";
         // do handshake via HTTP request
         NSString *protocol = _useSecure ? @"https" : @"http";
         NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
+        NSTimeInterval time = [[NSDate date] timeIntervalSince1970];
+        time = time * 1000;
         NSString *handshakeUrl = [NSString stringWithFormat:kHandshakeURL, protocol, _host, port, kResourceName, rand(), query];
         
         DEBUGLOG(@"Connecting to socket with URL: %@", handshakeUrl);
