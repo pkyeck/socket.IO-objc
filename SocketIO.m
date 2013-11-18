@@ -25,9 +25,6 @@
 #import "SocketIOPacket.h"
 #import "SocketIOJSONSerialization.h"
 
-#import "SocketIOTransportWebsocket.h"
-#import "SocketIOTransportXHR.h"
-
 #define DEBUG_LOGS 1
 #define DEBUG_CERTIFICATE 1
 
@@ -741,13 +738,25 @@ NSString* const SocketIOException = @"SocketIOException";
         NSArray *transports = [t componentsSeparatedByString:@","];
         DEBUGLOG(@"transports: %@", transports);
         
-        if ([transports indexOfObject:@"websocket"] != NSNotFound) {
-            DEBUGLOG(@"websocket supported -> using it now");
-            _transport = [[SocketIOTransportWebsocket alloc] initWithDelegate:self];
+        static Class webSocketTransportClass;
+        static Class xhrTransportClass;
+        
+        if(webSocketTransportClass == nil) {
+            webSocketTransportClass = NSClassFromString(@"SocketIOTransportWebsocket");
         }
-        else if ([transports indexOfObject:@"xhr-polling"] != NSNotFound) {
+        if(xhrTransportClass == nil) {
+            xhrTransportClass = NSClassFromString(@"SocketIOTransportXHR");
+        }
+        
+        
+        
+        if (webSocketTransportClass != nil && [transports indexOfObject:@"websocket"] != NSNotFound) {
+            DEBUGLOG(@"websocket supported -> using it now");
+            _transport = [[webSocketTransportClass alloc] initWithDelegate:self];
+        }
+        else if (xhrTransportClass != nil && [transports indexOfObject:@"xhr-polling"] != NSNotFound) {
             DEBUGLOG(@"xhr polling supported -> using it now");
-            _transport = [[SocketIOTransportXHR alloc] initWithDelegate:self];
+            _transport = [[xhrTransportClass alloc] initWithDelegate:self];
         }
         else {
             DEBUGLOG(@"no transport found that is supported :( -> fail");
