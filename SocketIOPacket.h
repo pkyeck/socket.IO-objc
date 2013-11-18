@@ -1,6 +1,6 @@
 //
 //  SocketIOPacket.h
-//  v0.4.0.1 ARC
+//  v0.4.1 ARC
 //
 //  based on
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa

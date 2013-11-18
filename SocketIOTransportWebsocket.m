@@ -1,6 +1,6 @@
 //
 //  SocketIOTransportWebsocket.m
-//  v0.4.0.1 ARC
+//  v0.4.1 ARC
 //
 //  based on
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -99,7 +99,9 @@ static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@";
 
 - (void) webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)message
 {
-    [delegate onData:message];
+    if([delegate respondsToSelector:@selector(onData:)]) {
+        [delegate onData:message];
+    }
 }
 
 - (void) webSocketDidOpen:(SRWebSocket *)webSocket
@@ -111,7 +113,9 @@ static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@";
 {
     DEBUGLOG(@"Socket failed with error ... %@", [error localizedDescription]);
     // Assuming this resulted in a disconnect
-    [delegate onDisconnect:error];
+    if([delegate respondsToSelector:@selector(onDisconnect:)]) {
+        [delegate onDisconnect:error];
+    }
 }
 
 - (void) webSocket:(SRWebSocket *)webSocket
@@ -120,9 +124,11 @@ static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@";
           wasClean:(BOOL)wasClean
 {
     DEBUGLOG(@"Socket closed. %@", reason);
-    [delegate onDisconnect:[NSError errorWithDomain:SocketIOError
-                                               code:SocketIOWebSocketClosed
-                                           userInfo:nil]];
+    if([delegate respondsToSelector:@selector(onDisconnect:)]) {
+        [delegate onDisconnect:[NSError errorWithDomain:SocketIOError
+                                                   code:SocketIOWebSocketClosed
+                                               userInfo:nil]];
+    }
 }
 
 @end

@@ -1,6 +1,6 @@
 //
 //  SocketIO.m
-//  v0.4.0.1 ARC
+//  v0.4.1 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -38,7 +38,7 @@
 #endif
 
 static NSString* kResourceName = @"socket.io";
-static NSString* kHandshakeURL = @"%@://%@%@/%@/1/?t=%d%@";
+static NSString* kHandshakeURL = @"%@://%@%@/%@/1/?t=%.0f%@";
 static NSString* kForceDisconnectURL = @"%@://%@%@/%@/1/xhr-polling/%@?disconnect";
 
 float const defaultConnectionTimeout = 10.0f;
@@ -135,7 +135,8 @@ NSString* const SocketIOException = @"SocketIOException";
         // do handshake via HTTP request
         NSString *protocol = _useSecure ? @"https" : @"http";
         NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
-        NSString *handshakeUrl = [NSString stringWithFormat:kHandshakeURL, protocol, _host, port, kResourceName, rand(), query];
+        NSTimeInterval time = [[NSDate date] timeIntervalSince1970] * 1000;
+        NSString *handshakeUrl = [NSString stringWithFormat:kHandshakeURL, protocol, _host, port, kResourceName, time, query];
         
         DEBUGLOG(@"Connecting to socket with URL: %@", handshakeUrl);
         query = nil;
@@ -676,7 +677,8 @@ NSString* const SocketIOException = @"SocketIOException";
     _isConnecting = NO;
     
     if ([_delegate respondsToSelector:@selector(socketIO:onError:)]) {
-        NSMutableDictionary *errorInfo = [NSDictionary dictionaryWithObject:error forKey:NSLocalizedDescriptionKey];
+        NSMutableDictionary *errorInfo = [[NSDictionary dictionaryWithObject:error
+                                                                      forKey:NSUnderlyingErrorKey] mutableCopy];
         
         NSError *err = [NSError errorWithDomain:SocketIOError
                                            code:SocketIOHandshakeFailed

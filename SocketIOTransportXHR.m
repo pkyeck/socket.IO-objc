@@ -1,6 +1,6 @@
 //
 //  SocketIOTransportXHR.m
-//  v0.4.0.1 ARC
+//  v0.4.1 ARC
 //
 //  based on
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -45,7 +45,8 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
 
 @implementation SocketIOTransportXHR
 
-@synthesize delegate;
+@synthesize delegate,
+            isClosed = _isClosed;
 
 - (id) initWithDelegate:(id<SocketIOTransportDelegate>)delegate_
 {
@@ -83,6 +84,8 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
         [conn cancel];
     }
     [_polls removeAllObjects];
+    
+    _isClosed = YES;
 }
 
 - (BOOL) isReady
@@ -101,6 +104,10 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
 
 - (void) checkAndStartPoll
 {
+    if (_isClosed) {
+        return;
+    }
+    
     BOOL restart = NO;
     // no polls currently running -> start one
     if ([_polls count] == 0) {
@@ -240,9 +247,11 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
     
     if (![message isEqualToString:@"1"]) {
         NSArray *messages = [self packetsFromPayload:message];
-        [messages enumerateObjectsUsingBlock:^(NSString *message, NSUInteger idx, BOOL *stop) {
-            [delegate onData:message];
-        }];
+        if([delegate respondsToSelector:@selector(onData:)]) {
+            [messages enumerateObjectsUsingBlock:^(NSString *message, NSUInteger idx, BOOL *stop) {
+                [delegate onData:message];
+            }];
+        }
     }
     
     // remove current connection from pool

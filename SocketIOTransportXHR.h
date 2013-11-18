@@ -1,6 +1,6 @@
 //
 //  SocketIOTransportXHR.h
-//  v0.4.0.1 ARC
+//  v0.4.1 ARC
 //
 //  based on
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -30,8 +30,10 @@
     NSString *_url;
     NSMutableData *_data;
     NSMutableDictionary *_polls;
+    BOOL _isClosed;
 }
 
-@property (nonatomic, unsafe_unretained) id <SocketIOTransportDelegate> delegate;
+@property (nonatomic, weak) id <SocketIOTransportDelegate> delegate;
+@property (nonatomic) BOOL isClosed;
 
 @end
