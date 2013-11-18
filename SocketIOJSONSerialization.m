@@ -23,93 +23,15 @@
 
 #import "SocketIOJSONSerialization.h"
 
-extern NSString * const SocketIOException;
-
-// covers the methods in SBJson and JSONKit
-@interface NSObject (SocketIOJSONSerialization)
-
-// used by both JSONKit and SBJson
-- (id) objectWithData:(NSData *)data;
-
-// Use by JSONKit serialization
-- (NSString *) JSONString;
-- (id) decoder;
-
-// Used by SBJsonWriter
-- (NSString *) stringWithObject:(id)object;
-
-@end
-
 @implementation SocketIOJSONSerialization
 
 + (id) objectFromJSONData:(NSData *)data error:(NSError **)error {
-    Class serializer;
-    
-    // try SBJson first
-    serializer = NSClassFromString(@"SBJsonParser");
-    if (serializer) {
-        id parser;
-        id object;
-        
-        parser = [[serializer alloc] init];
-        object = [parser objectWithData:data];
-        
-        return object;
-    }
-    
-    // try Foundation's JSON coder, available in OS X 10.7/iOS 5.0
-    serializer = NSClassFromString(@"NSJSONSerialization");
-    if (serializer) {
-        return [serializer JSONObjectWithData:data options:0 error:error];
-    }
-    
-    // lastly, try JSONKit
-    serializer = NSClassFromString(@"JSONDecoder");
-    if (serializer) {
-        return [[serializer decoder] objectWithData:data];
-    }
-    
-    // unable to find a suitable JSON deseralizer
-    [NSException raise:SocketIOException format:@"socket.IO-objc requires SBJson, JSONKit or an OS that has NSJSONSerialization."];
-    
-    return nil;
+    return [NSJSONSerialization JSONObjectWithData:data options:0 error:error];    
 }
 
 + (NSString *) JSONStringFromObject:(id)object error:(NSError **)error {
-    Class     serializer;
-    NSString *jsonString;
-    
-    jsonString = nil;
-    serializer = NSClassFromString(@"SBJsonWriter");
-    if (serializer) {
-        id writer;
-        
-        writer = [[serializer alloc] init];
-        jsonString = [writer stringWithObject:object];
-        
-        return jsonString;
-    }
-    
-    serializer = NSClassFromString(@"NSJSONSerialization");
-    if (serializer) {
-        NSData *data;
-        
-        data = [serializer dataWithJSONObject:object options:0 error:error];
-        
-        jsonString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        
-        return jsonString;
-    }
-    
-    // lastly, try JSONKit
-    if ([object respondsToSelector:@selector(JSONString)]) {
-        return [object JSONString];
-    }
-    
-    // unable to find a suitable JSON seralizer
-    [NSException raise:SocketIOException format:@"socket.IO-objc requires SBJson, JSONKit or an OS that has NSJSONSerialization."];
-    
-    return nil;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:object options:0 error:error];
+    return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];    
 }
 
 @end
