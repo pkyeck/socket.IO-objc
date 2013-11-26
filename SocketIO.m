@@ -570,8 +570,8 @@ NSString* const SocketIOException = @"SocketIOException";
                     NSString *key = [NSString stringWithFormat:@"%d", ackId];
                     SocketIOCallback callbackFunction = [_acks objectForKey:key];
                     if (callbackFunction != nil) {
-                        callbackFunction(argsData);
                         [self removeAcknowledgeForKey:key];
+                        callbackFunction(argsData);
                     }
                 }
                 
