@@ -1,8 +1,7 @@
 //
 //  SocketIO+Blocks.m
-//  LetterWar
 //
-//  Created by Антон Домашнев on 06.11.13.
+//  Created by Anton Domashnev on 06.11.13.
 //  Copyright (c) 2013 Anton Domashnev. All rights reserved.
 //
 
