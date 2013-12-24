@@ -37,8 +37,46 @@
 		4ADCCBF115790FD30022990C /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBF015790FD30022990C /* MobileCoreServices.framework */; };
 		4ADCCBF315790FDF0022990C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBF215790FDF0022990C /* SystemConfiguration.framework */; };
 		4ADCCD4D157915F00022990C /* SocketIO.m in Sources */ = {isa = PBXBuildFile; fileRef = 4ADCCBC715790DEC0022990C /* SocketIO.m */; };
+		6CD8A5361869AAFB00FA8FA7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A444FA21589E29500B44ABB /* Security.framework */; };
+		6CD8A5371869AAFF00FA8FA7 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A444FA01589E28800B44ABB /* libicucore.dylib */; };
+		6CD8A5381869AB0200FA8FA7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBF215790FDF0022990C /* SystemConfiguration.framework */; };
+		6CD8A5391869AB0600FA8FA7 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBF015790FD30022990C /* MobileCoreServices.framework */; };
+		6CD8A53A1869AB0800FA8FA7 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBEE15790FC70022990C /* CFNetwork.framework */; };
+		6CD8A53B1869AB0B00FA8FA7 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBA115790D760022990C /* UIKit.framework */; };
+		6CD8A53C1869AB0F00FA8FA7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBA315790D760022990C /* Foundation.framework */; };
+		6CD8A53D1869AB1100FA8FA7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBA515790D760022990C /* CoreGraphics.framework */; };
+		6CD8A53E1869AB2900FA8FA7 /* SocketIO.m in Sources */ = {isa = PBXBuildFile; fileRef = 4ADCCBC715790DEC0022990C /* SocketIO.m */; };
+		6CD8A53F1869AB2E00FA8FA7 /* SocketIOPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AD96DF31680853E00D9E42D /* SocketIOPacket.m */; };
+		6CD8A5401869AB3000FA8FA7 /* SocketIOJSONSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */; };
+		6CD8A5411869AB3400FA8FA7 /* SocketIOTransportWebsocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AD96DF716808B7900D9E42D /* SocketIOTransportWebsocket.m */; };
+		6CD8A5421869AB3700FA8FA7 /* SocketIOTransportXHR.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AD96DFB16822DE300D9E42D /* SocketIOTransportXHR.m */; };
+		6CD8A5431869AB3D00FA8FA7 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A92E903179548B40077B69C /* SBJsonParser.m */; };
+		6CD8A5441869AB3F00FA8FA7 /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A92E905179548B40077B69C /* SBJsonStreamParser.m */; };
+		6CD8A5451869AB4100FA8FA7 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A92E907179548B40077B69C /* SBJsonStreamParserAccumulator.m */; };
+		6CD8A5461869AB4400FA8FA7 /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A92E909179548B40077B69C /* SBJsonStreamParserAdapter.m */; };
+		6CD8A5471869AB4700FA8FA7 /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A92E90B179548B40077B69C /* SBJsonStreamParserState.m */; };
+		6CD8A5481869AB4A00FA8FA7 /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A92E90D179548B40077B69C /* SBJsonStreamTokeniser.m */; };
+		6CD8A5491869AB4C00FA8FA7 /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A92E90F179548B40077B69C /* SBJsonStreamWriter.m */; };
+		6CD8A54A1869AB4E00FA8FA7 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A92E911179548B40077B69C /* SBJsonStreamWriterAccumulator.m */; };
+		6CD8A54B1869AB5100FA8FA7 /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A92E913179548B40077B69C /* SBJsonStreamWriterState.m */; };
+		6CD8A54C1869AB5500FA8FA7 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A92E915179548B40077B69C /* SBJsonWriter.m */; };
+		6CD8A54D1869AB5B00FA8FA7 /* base64.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A44537A1589EE9100B44ABB /* base64.c */; };
+		6CD8A54E1869AB6000FA8FA7 /* NSData+SRB64Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A44537D1589EE9100B44ABB /* NSData+SRB64Additions.m */; };
+		6CD8A54F1869AB6600FA8FA7 /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A4453801589EE9100B44ABB /* SRWebSocket.m */; };
 		C9E391A215E2A1B00004693A /* SocketIOJSONSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6CD8A5111869AAD600FA8FA7 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		4A444FA01589E28800B44ABB /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
@@ -96,6 +134,8 @@
 		4ADCCBEE15790FC70022990C /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		4ADCCBF015790FD30022990C /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		4ADCCBF215790FDF0022990C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		6CD8A5131869AAD600FA8FA7 /* libSocketIO.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSocketIO.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		6CD8A5501869AC2300FA8FA7 /* SocketIO-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SocketIO-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		C9E391A015E2A1B00004693A /* SocketIOJSONSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOJSONSerialization.h; sourceTree = SOURCE_ROOT; };
 		C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOJSONSerialization.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -113,6 +153,21 @@
 				4ADCCBF115790FD30022990C /* MobileCoreServices.framework in Frameworks */,
 				4ADCCBF315790FDF0022990C /* SystemConfiguration.framework in Frameworks */,
 				4ADCCBA215790D760022990C /* UIKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CD8A5101869AAD600FA8FA7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6CD8A53A1869AB0800FA8FA7 /* CFNetwork.framework in Frameworks */,
+				6CD8A5361869AAFB00FA8FA7 /* Security.framework in Frameworks */,
+				6CD8A5371869AAFF00FA8FA7 /* libicucore.dylib in Frameworks */,
+				6CD8A5381869AB0200FA8FA7 /* SystemConfiguration.framework in Frameworks */,
+				6CD8A53D1869AB1100FA8FA7 /* CoreGraphics.framework in Frameworks */,
+				6CD8A5391869AB0600FA8FA7 /* MobileCoreServices.framework in Frameworks */,
+				6CD8A53C1869AB0F00FA8FA7 /* Foundation.framework in Frameworks */,
+				6CD8A53B1869AB0B00FA8FA7 /* UIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -175,6 +230,7 @@
 			isa = PBXGroup;
 			children = (
 				4ADCCB9D15790D760022990C /* SocketTesterARC.app */,
+				6CD8A5131869AAD600FA8FA7 /* libSocketIO.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -204,6 +260,7 @@
 				4ADCCBB315790D760022990C /* ViewController.h */,
 				4ADCCBB415790D760022990C /* ViewController.m */,
 				4ADCCBB615790D760022990C /* ViewController.xib */,
+				6CD8A5501869AC2300FA8FA7 /* SocketIO-Prefix.pch */,
 				4ADCCBC615790DEC0022990C /* SocketIO.h */,
 				4ADCCBC715790DEC0022990C /* SocketIO.m */,
 				4AD96DF21680853E00D9E42D /* SocketIOPacket.h */,
@@ -251,6 +308,23 @@
 			productReference = 4ADCCB9D15790D760022990C /* SocketTesterARC.app */;
 			productType = "com.apple.product-type.application";
 		};
+		6CD8A5121869AAD600FA8FA7 /* SocketIO */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6CD8A5341869AAD700FA8FA7 /* Build configuration list for PBXNativeTarget "SocketIO" */;
+			buildPhases = (
+				6CD8A50F1869AAD600FA8FA7 /* Sources */,
+				6CD8A5101869AAD600FA8FA7 /* Frameworks */,
+				6CD8A5111869AAD600FA8FA7 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SocketIO;
+			productName = SocketIO;
+			productReference = 6CD8A5131869AAD600FA8FA7 /* libSocketIO.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -273,6 +347,7 @@
 			projectRoot = "";
 			targets = (
 				4ADCCB9C15790D760022990C /* SocketTesterARC */,
+				6CD8A5121869AAD600FA8FA7 /* SocketIO */,
 			);
 		};
 /* End PBXProject section */
@@ -315,6 +390,31 @@
 				4A92E91D179548B40077B69C /* SBJsonStreamWriterAccumulator.m in Sources */,
 				4A92E91E179548B40077B69C /* SBJsonStreamWriterState.m in Sources */,
 				4A92E91F179548B40077B69C /* SBJsonWriter.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CD8A50F1869AAD600FA8FA7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6CD8A5411869AB3400FA8FA7 /* SocketIOTransportWebsocket.m in Sources */,
+				6CD8A54C1869AB5500FA8FA7 /* SBJsonWriter.m in Sources */,
+				6CD8A53F1869AB2E00FA8FA7 /* SocketIOPacket.m in Sources */,
+				6CD8A5451869AB4100FA8FA7 /* SBJsonStreamParserAccumulator.m in Sources */,
+				6CD8A54E1869AB6000FA8FA7 /* NSData+SRB64Additions.m in Sources */,
+				6CD8A5471869AB4700FA8FA7 /* SBJsonStreamParserState.m in Sources */,
+				6CD8A54F1869AB6600FA8FA7 /* SRWebSocket.m in Sources */,
+				6CD8A5421869AB3700FA8FA7 /* SocketIOTransportXHR.m in Sources */,
+				6CD8A5431869AB3D00FA8FA7 /* SBJsonParser.m in Sources */,
+				6CD8A5441869AB3F00FA8FA7 /* SBJsonStreamParser.m in Sources */,
+				6CD8A54B1869AB5100FA8FA7 /* SBJsonStreamWriterState.m in Sources */,
+				6CD8A5491869AB4C00FA8FA7 /* SBJsonStreamWriter.m in Sources */,
+				6CD8A54A1869AB4E00FA8FA7 /* SBJsonStreamWriterAccumulator.m in Sources */,
+				6CD8A5481869AB4A00FA8FA7 /* SBJsonStreamTokeniser.m in Sources */,
+				6CD8A53E1869AB2900FA8FA7 /* SocketIO.m in Sources */,
+				6CD8A5401869AB3000FA8FA7 /* SocketIOJSONSerialization.m in Sources */,
+				6CD8A54D1869AB5B00FA8FA7 /* base64.c in Sources */,
+				6CD8A5461869AB4400FA8FA7 /* SBJsonStreamParserAdapter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,7 +465,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -388,7 +488,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -427,6 +527,57 @@
 			};
 			name = Release;
 		};
+		6CD8A5301869AAD700FA8FA7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				DSTROOT = /tmp/SocketIO.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SocketIO-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		6CD8A5311869AAD700FA8FA7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				DSTROOT = /tmp/SocketIO.dst;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SocketIO-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -444,6 +595,15 @@
 			buildConfigurations = (
 				4ADCCBBC15790D760022990C /* Debug */,
 				4ADCCBBD15790D760022990C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6CD8A5341869AAD700FA8FA7 /* Build configuration list for PBXNativeTarget "SocketIO" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6CD8A5301869AAD700FA8FA7 /* Debug */,
+				6CD8A5311869AAD700FA8FA7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
