@@ -47,6 +47,7 @@ typedef enum {
 @optional
 - (void) socketIODidConnect:(SocketIO *)socket;
 - (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error;
+- (void)socketIORequireReconnect:(SocketIO *)socket;
 - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
@@ -80,6 +81,7 @@ typedef enum {
     // heartbeat
     NSTimeInterval _heartbeatTimeout;
     dispatch_source_t _timeout;
+    dispatch_source_t _reconnectTimeout;
     
     NSMutableArray *_queue;
     
@@ -100,6 +102,7 @@ typedef enum {
 @property (nonatomic, readonly) NSTimeInterval heartbeatTimeout;
 @property (nonatomic) BOOL useSecure;
 @property (nonatomic, readonly) BOOL isConnected, isConnecting;
+@property (nonatomic, assign) BOOL allowsReconnect;
 @property (nonatomic, weak) id<SocketIODelegate> delegate;
 @property (nonatomic) BOOL returnAllDataFromAck;
 
