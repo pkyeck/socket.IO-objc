@@ -15,12 +15,6 @@
 
 As of version 0.4, this library requires at least OS X 10.7 or iOS 5.0.
 
-
-## Non-ARC version
-
-If you're old school - there's still the [non-ARC version](https://github.com/pkyeck/socket.IO-objc/tree/non-arc) for you.
-This version (the non-ARC one) is out-of-date and won't be maintained any further (at least not by me).
-
 ## Usage
 
 The easiest way to connect to your Socket.IO / node.js server is
@@ -110,6 +104,24 @@ To process an incoming Message just
 {
     NSLog(@"didReceiveMessage() >>> data: %@", packet.data);
 }
+```
+
+## Usage with OS X
+
+Running the socket.io-objc with OS X requires some minor changes:
+
+- you have to use the SocketRocket.framework for OSX instead of just the submodule  
+see: [SocketRocket's Installing OS X](https://github.com/square/SocketRocket#installing-os-x)  
+(best way I got this to work was as a subproject and I didn't have to add the "copy file" stuff)
+
+- when using the other framework, you have to fix the import-statement in SocketIOTransportWebsocket.h
+
+``` objective-c
+// replace
+#import SRWebSocket.h
+
+// with
+#import <SocketRocket/SRWebSocket.h>
 ```
 	
 ## Authors
