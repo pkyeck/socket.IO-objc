@@ -97,24 +97,31 @@ be removed in upcoming releases:
 - (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error;
 ```
 
-To process an incoming Message just
+To process an incoming `message` or `event` just
 
 ``` objective-c
+// message delegate
 - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet
 {
-    NSLog(@"didReceiveMessage() >>> data: %@", packet.data);
+    NSLog(@"didReceiveMessage >>> data: %@", packet.data);
+}
+
+// event delegate
+- (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet
+{
+    NSLog(@"didReceiveEvent >>> data: %@", packet.data);
 }
 ```
 
 ## Usage with OS X
 
-Running the socket.io-objc with OS X requires some minor changes:
+Running the socket.io-objc library with OS X requires some minor changes:
 
 - you have to use the SocketRocket.framework for OSX instead of just the submodule  
 see: [SocketRocket's Installing OS X](https://github.com/square/SocketRocket#installing-os-x)  
 (best way I got this to work was as a subproject and I didn't have to add the "copy file" stuff)
 
-- when using the other framework, you have to fix the import-statement in SocketIOTransportWebsocket.h
+- when using the osx-framework, you have to fix the import-statement in SocketIOTransportWebsocket.h
 
 ``` objective-c
 // replace
@@ -135,7 +142,7 @@ Different Socket Libraries + Error Handling by taiyangc <https://github.com/taiy
 
 (The MIT License)
 
-Copyright (c) 2011-13 Philipp Kyeck <http://beta-interactive.de>
+Copyright (c) 2011-14 Philipp Kyeck <http://beta-interactive.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
