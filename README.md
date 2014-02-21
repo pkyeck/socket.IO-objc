@@ -7,13 +7,12 @@
    * [SocketRocket](https://github.com/square/SocketRocket)
   Look [here](https://github.com/square/SocketRocket#installing-ios) for further instructions how to use/install SocketRocket.
 
-  JSON serialization can be provided by SBJson (json-framework), JSONKit or by Foundation in OS X 10.7/iOS 5.0.  These are selected at runtime and introduce no source-level dependencies.
-   * [json-framework](https://github.com/stig/json-framework/) (optional)
-   * [JSONKit](https://github.com/johnezang/JSONKit/) (optional)
 
 ## Requirements
 
 As of version 0.4, this library requires at least OS X 10.7 or iOS 5.0.
+Because of this, we were able to remove the external JSON frameworks in v0.5 and only rely on iOS' own `NSJSONSerialization`.
+
 
 ## Usage
 
@@ -80,21 +79,12 @@ All delegate methods are optional - you could implement the following
 
 ``` objective-c
 - (void) socketIODidConnect:(SocketIO *)socket;
-- (void) socketIODidDisconnect:(SocketIO *)socket; // deprecated
 - (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error;
 - (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didSendMessage:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket onError:(NSError *)error;
-```
-
-These two callbacks are deprecated - please don't use them anymore - they will
-be removed in upcoming releases:
-
-``` objective-c
-- (void) socketIOHandshakeFailed:(SocketIO *)socket;
-- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error;
 ```
 
 To process an incoming `message` or `event` just

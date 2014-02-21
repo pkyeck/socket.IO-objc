@@ -1,6 +1,6 @@
 //
 //  SocketIO.m
-//  v0.4.1 ARC
+//  v0.5 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -25,11 +25,13 @@
 #import "SocketIOPacket.h"
 #import "SocketIOJSONSerialization.h"
 
-#import "SocketIOTransportWebsocket.h"
-#import "SocketIOTransportXHR.h"
-
+#ifdef DEBUG
 #define DEBUG_LOGS 1
 #define DEBUG_CERTIFICATE 1
+#else
+#define DEBUG_LOGS 0
+#define DEBUG_CERTIFICATE 0
+#endif
 
 #if DEBUG_LOGS
 #define DEBUGLOG(...) NSLog(__VA_ARGS__)
@@ -686,13 +688,6 @@ NSString* const SocketIOException = @"SocketIOException";
         
         [_delegate socketIO:self onError:err];
     }
-    // TODO: deprecated - to be removed
-    else if ([_delegate respondsToSelector:@selector(socketIOHandshakeFailed:)]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        [_delegate socketIOHandshakeFailed:self];
-#pragma clang diagnostic pop
-    }
 }
 
 - (void) connectionDidFinishLoading:(NSURLConnection *)connection 
@@ -741,13 +736,23 @@ NSString* const SocketIOException = @"SocketIOException";
         NSArray *transports = [t componentsSeparatedByString:@","];
         DEBUGLOG(@"transports: %@", transports);
         
-        if ([transports indexOfObject:@"websocket"] != NSNotFound) {
-            DEBUGLOG(@"websocket supported -> using it now");
-            _transport = [[SocketIOTransportWebsocket alloc] initWithDelegate:self];
+        static Class webSocketTransportClass;
+        static Class xhrTransportClass;
+        
+        if (webSocketTransportClass == nil) {
+            webSocketTransportClass = NSClassFromString(@"SocketIOTransportWebsocket");
         }
-        else if ([transports indexOfObject:@"xhr-polling"] != NSNotFound) {
+        if (xhrTransportClass == nil) {
+            xhrTransportClass = NSClassFromString(@"SocketIOTransportXHR");
+        }
+        
+        if (webSocketTransportClass != nil && [transports indexOfObject:@"websocket"] != NSNotFound) {
+            DEBUGLOG(@"websocket supported -> using it now");
+            _transport = [[webSocketTransportClass alloc] initWithDelegate:self];
+        }
+        else if (xhrTransportClass != nil && [transports indexOfObject:@"xhr-polling"] != NSNotFound) {
             DEBUGLOG(@"xhr polling supported -> using it now");
-            _transport = [[SocketIOTransportXHR alloc] initWithDelegate:self];
+            _transport = [[xhrTransportClass alloc] initWithDelegate:self];
         }
         else {
             DEBUGLOG(@"no transport found that is supported :( -> fail");
@@ -769,13 +774,6 @@ NSString* const SocketIOException = @"SocketIOException";
 
         if ([_delegate respondsToSelector:@selector(socketIO:onError:)]) {
             [_delegate socketIO:self onError:error];
-        }
-        // TODO: deprecated - to be removed
-        else if ([_delegate respondsToSelector:@selector(socketIO:failedToConnectWithError:)]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            [_delegate socketIO:self failedToConnectWithError:error];
-#pragma clang diagnostic pop
         }
         
         // make sure to do call all cleanup code

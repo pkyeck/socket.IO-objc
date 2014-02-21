@@ -1,6 +1,6 @@
 //
 //  SocketIO.h
-//  v0.4.1 ARC
+//  v0.5 ARC
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -52,10 +52,6 @@ typedef enum {
 - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket didSendMessage:(SocketIOPacket *)packet;
 - (void) socketIO:(SocketIO *)socket onError:(NSError *)error;
-
-// TODO: deprecated -> to be removed
-- (void) socketIO:(SocketIO *)socket failedToConnectWithError:(NSError *)error __attribute__((deprecated));
-- (void) socketIOHandshakeFailed:(SocketIO *)socket __attribute__((deprecated));
 @end
 
 
