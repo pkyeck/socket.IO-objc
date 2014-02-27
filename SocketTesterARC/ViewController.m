@@ -29,7 +29,10 @@
     // socketIO.useSecure = YES;
     
     // connect to the socket.io server that is running locally at port 3000
-    [socketIO connectToHost:@"localhost" onPort:3000];
+    NSMutableDictionary *params = [NSMutableDictionary new];
+    [params setObject: @"6f7a7792814a43ec8f344ed053f1280b" forKey: @"access_token"];
+    NSDictionary *headers = [NSDictionary dictionaryWithObjectsAndKeys: @"qc_0=123", @"Cookie", nil];
+    [socketIO connectToHost:@"localhost" onPort:8000 withParams: params withHeaders: headers];
 }
 
 # pragma mark -
