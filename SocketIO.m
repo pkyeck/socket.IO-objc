@@ -158,9 +158,7 @@ NSString* const SocketIOException = @"SocketIOException";
                                              timeoutInterval:connectionTimeout];
 
         if (headers != nil)  {
-            NSMutableDictionary *newHeaders = [[request allHTTPHeaderFields] mutableCopy];
-            [newHeaders addEntriesFromDictionary: headers];
-            [request setAllHTTPHeaderFields: newHeaders];
+            [request setAllHTTPHeaderFields: headers];
         }
         
         _handshake = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
