@@ -1,6 +1,6 @@
 //
 //  SocketIO.h
-//  v0.5 ARC
+//  v0.5.1
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -8,17 +8,14 @@
 //
 //  using
 //  https://github.com/square/SocketRocket
-//  https://github.com/stig/json-framework/
 //
 //  reusing some parts of
 //  /socket.io/socket.io.js
 //
 //  Created by Philipp Kyeck http://beta-interactive.de
 //
-//  Updated by 
-//    samlown   https://github.com/samlown
-//    kayleg    https://github.com/kayleg
-//    taiyangc  https://github.com/taiyangc
+//  With help from
+//    https://github.com/pkyeck/socket.IO-objc/blob/master/CONTRIBUTORS.md
 //
 
 #import <Foundation/Foundation.h>
@@ -39,7 +36,8 @@ typedef enum {
     SocketIOWebSocketClosed = -4,
     SocketIOTransportsNotSupported = -5,
     SocketIOHandshakeFailed = -6,
-    SocketIODataCouldNotBeSend = -7
+    SocketIODataCouldNotBeSend = -7,
+    SocketIOUnauthorized = -8
 } SocketIOErrorCodes;
 
 
@@ -71,6 +69,8 @@ typedef enum {
     BOOL _isConnecting;
     BOOL _useSecure;
     
+    NSArray *_cookies;
+    
     NSURLConnection *_handshake;
     
     // heartbeat
@@ -95,6 +95,7 @@ typedef enum {
 @property (nonatomic, readonly) NSString *sid;
 @property (nonatomic, readonly) NSTimeInterval heartbeatTimeout;
 @property (nonatomic) BOOL useSecure;
+@property (nonatomic) NSArray *cookies;
 @property (nonatomic, readonly) BOOL isConnected, isConnecting;
 @property (nonatomic, weak) id<SocketIODelegate> delegate;
 @property (nonatomic) BOOL returnAllDataFromAck;

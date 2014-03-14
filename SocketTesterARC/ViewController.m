@@ -28,6 +28,18 @@
     // if you want to use https instead of http
     // socketIO.useSecure = YES;
     
+    // pass cookie(s) to handshake endpoint (e.g. for auth)
+    NSDictionary *properties = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    @"localhost", NSHTTPCookieDomain,
+                                    @"/", NSHTTPCookiePath,
+                                    @"auth", NSHTTPCookieName,
+                                    @"56cdea636acdf132", NSHTTPCookieValue,
+                                    nil];
+    NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:properties];
+    NSArray *cookies = [NSArray arrayWithObjects:cookie, nil];
+    
+    socketIO.cookies = cookies;
+    
     // connect to the socket.io server that is running locally at port 3000
     [socketIO connectToHost:@"localhost" onPort:3000];
 }
@@ -43,7 +55,8 @@
 - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet
 {
     NSLog(@"didReceiveEvent()");
-    
+
+    // test acknowledge
     SocketIOCallback cb = ^(id argsData) {
         NSDictionary *response = argsData;
         // do something with response
@@ -53,11 +66,26 @@
         [socketIO disconnectForced];
     };
     [socketIO sendMessage:@"hello back!" withAcknowledge:cb];
+    
+    // test different event data types
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setObject:@"test1" forKey:@"key1"];
+    [dict setObject:@"test2" forKey:@"key2"];
+    [socketIO sendEvent:@"welcome" withData:dict];
+    
+    [socketIO sendEvent:@"welcome" withData:@"testWithString"];
+    
+    NSArray *arr = [NSArray arrayWithObjects:@"test1", @"test2", nil];
+    [socketIO sendEvent:@"welcome" withData:arr];
 }
 
 - (void) socketIO:(SocketIO *)socket onError:(NSError *)error
 {
-    NSLog(@"onError() %@", error);
+    if ([error code] == SocketIOUnauthorized) {
+        NSLog(@"not authorized");
+    } else {
+        NSLog(@"onError() %@", error);
+    }
 }
 
 
