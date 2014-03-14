@@ -39,7 +39,8 @@ typedef enum {
     SocketIOWebSocketClosed = -4,
     SocketIOTransportsNotSupported = -5,
     SocketIOHandshakeFailed = -6,
-    SocketIODataCouldNotBeSend = -7
+    SocketIODataCouldNotBeSend = -7,
+    SocketIOUnauthorized = -8
 } SocketIOErrorCodes;
 
 

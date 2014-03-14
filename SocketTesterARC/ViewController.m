@@ -37,9 +37,9 @@
                                     nil];
     NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:properties];
     NSArray *cookies = [NSArray arrayWithObjects:cookie, nil];
-
+    
     socketIO.cookies = cookies;
-
+    
     // connect to the socket.io server that is running locally at port 3000
     [socketIO connectToHost:@"localhost" onPort:3000];
 }
@@ -55,7 +55,7 @@
 - (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet
 {
     NSLog(@"didReceiveEvent()");
-    
+
     SocketIOCallback cb = ^(id argsData) {
         NSDictionary *response = argsData;
         // do something with response
@@ -69,7 +69,11 @@
 
 - (void) socketIO:(SocketIO *)socket onError:(NSError *)error
 {
-    NSLog(@"onError() %@", error);
+    if ([error code] == SocketIOUnauthorized) {
+        NSLog(@"not authorized");
+    } else {
+        NSLog(@"onError() %@", error);
+    }
 }
 
 

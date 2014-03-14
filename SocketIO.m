@@ -684,6 +684,8 @@ NSString* const SocketIOException = @"SocketIOException";
 {
     NSLog(@"ERROR: handshake failed ... %@", [error localizedDescription]);
     
+    int errorCode = [error code] == 403 ? SocketIOUnauthorized : SocketIOHandshakeFailed;
+
     _isConnected = NO;
     _isConnecting = NO;
     
@@ -692,7 +694,7 @@ NSString* const SocketIOException = @"SocketIOException";
                                                                       forKey:NSUnderlyingErrorKey] mutableCopy];
         
         NSError *err = [NSError errorWithDomain:SocketIOError
-                                           code:SocketIOHandshakeFailed
+                                           code:errorCode
                                        userInfo:errorInfo];
         
         [_delegate socketIO:self onError:err];
