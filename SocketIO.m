@@ -79,6 +79,7 @@ NSString* const SocketIOException = @"SocketIOException";
 @synthesize isConnected = _isConnected, 
             isConnecting = _isConnecting, 
             useSecure = _useSecure, 
+            cookies = _cookies,
             delegate = _delegate,
             heartbeatTimeout = _heartbeatTimeout,
             returnAllDataFromAck = _returnAllDataFromAck;
@@ -106,11 +107,6 @@ NSString* const SocketIOException = @"SocketIOException";
     [self connectToHost:host onPort:port withParams:params withNamespace:@"" withConnectionTimeout:defaultConnectionTimeout];
 }
 
-- (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withCookieParams:(NSDictionary *)cookieParams
-{
-    [self connectToHost:host onPort:port withParams:params withCookieParams:cookieParams withNamespace:@"" withConnectionTimeout:defaultConnectionTimeout];
-}
-
 - (void) connectToHost:(NSString *)host
                 onPort:(NSInteger)port
             withParams:(NSDictionary *)params
@@ -122,25 +118,6 @@ NSString* const SocketIOException = @"SocketIOException";
 - (void) connectToHost:(NSString *)host
                 onPort:(NSInteger)port
             withParams:(NSDictionary *)params
-      withCookieParams:(NSDictionary *)cookieParams
-         withNamespace:(NSString *)endpoint
-{
-    [self connectToHost:host onPort:port withParams:params withCookieParams:cookieParams withNamespace:endpoint withConnectionTimeout:defaultConnectionTimeout];
-}
-
-- (void) connectToHost:(NSString *)host
-                onPort:(NSInteger)port
-            withParams:(NSDictionary *)params
-         withNamespace:(NSString *)endpoint
- withConnectionTimeout:(NSTimeInterval)connectionTimeout
-{
-    [self connectToHost:host onPort:port withParams:params withCookieParams:nil withNamespace:endpoint withConnectionTimeout:defaultConnectionTimeout];
-}
-
-- (void) connectToHost:(NSString *)host
-                onPort:(NSInteger)port
-            withParams:(NSDictionary *)params
-      withCookieParams:(NSDictionary *)cookieParams
          withNamespace:(NSString *)endpoint
  withConnectionTimeout:(NSTimeInterval)connectionTimeout
 {
@@ -172,10 +149,9 @@ NSString* const SocketIOException = @"SocketIOException";
                                                  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData 
                                              timeoutInterval:connectionTimeout];
         
-        if (cookieParams) {
-            NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieParams];
-            NSArray* cookieArray = [NSArray arrayWithObjects: cookie, nil];
-            NSDictionary * headers = [NSHTTPCookie requestHeaderFieldsWithCookies:cookieArray];
+        if (_cookies != nil) {
+            DEBUGLOG(@"Adding cookie(s): %@", [_cookies description]);
+            NSDictionary *headers = [NSHTTPCookie requestHeaderFieldsWithCookies:_cookies];
             [request setAllHTTPHeaderFields:headers];
         }
         

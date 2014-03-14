@@ -71,6 +71,8 @@ typedef enum {
     BOOL _isConnecting;
     BOOL _useSecure;
     
+    NSArray *_cookies;
+
     NSURLConnection *_handshake;
     
     // heartbeat
@@ -95,6 +97,7 @@ typedef enum {
 @property (nonatomic, readonly) NSString *sid;
 @property (nonatomic, readonly) NSTimeInterval heartbeatTimeout;
 @property (nonatomic) BOOL useSecure;
+@property (nonatomic) NSArray *cookies;
 @property (nonatomic, readonly) BOOL isConnected, isConnecting;
 @property (nonatomic, weak) id<SocketIODelegate> delegate;
 @property (nonatomic) BOOL returnAllDataFromAck;
@@ -102,12 +105,8 @@ typedef enum {
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params;
-- (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withCookieParams:(NSDictionary *)cookieParams;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint;
-- (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withCookieParams:(NSDictionary *)cookieParams withNamespace:(NSString *)endpoint;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint withConnectionTimeout: (NSTimeInterval) connectionTimeout;
-- (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withCookieParams:(NSDictionary *)cookieParams withNamespace:(NSString *)endpoint withConnectionTimeout: (NSTimeInterval) connectionTimeout;
-
 
 - (void) disconnect;
 - (void) disconnectForced;
