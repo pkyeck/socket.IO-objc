@@ -28,6 +28,18 @@
     // if you want to use https instead of http
     // socketIO.useSecure = YES;
     
+    // pass cookie(s) to handshake endpoint (e.g. for auth)
+    NSDictionary *properties = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    @"localhost", NSHTTPCookieDomain,
+                                    @"/", NSHTTPCookiePath,
+                                    @"auth", NSHTTPCookieName,
+                                    @"56cdea636acdf132", NSHTTPCookieValue,
+                                    nil];
+    NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:properties];
+    NSArray *cookies = [NSArray arrayWithObjects:cookie, nil];
+
+    socketIO.cookies = cookies;
+
     // connect to the socket.io server that is running locally at port 3000
     [socketIO connectToHost:@"localhost" onPort:3000];
 }
