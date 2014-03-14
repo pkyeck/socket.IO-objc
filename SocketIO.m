@@ -106,6 +106,11 @@ NSString* const SocketIOException = @"SocketIOException";
     [self connectToHost:host onPort:port withParams:params withNamespace:@"" withConnectionTimeout:defaultConnectionTimeout];
 }
 
+- (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withCookieParams:(NSDictionary *)cookieParams
+{
+    [self connectToHost:host onPort:port withParams:params withCookieParams:cookieParams withNamespace:@"" withConnectionTimeout:defaultConnectionTimeout];
+}
+
 - (void) connectToHost:(NSString *)host
                 onPort:(NSInteger)port
             withParams:(NSDictionary *)params
@@ -117,6 +122,25 @@ NSString* const SocketIOException = @"SocketIOException";
 - (void) connectToHost:(NSString *)host
                 onPort:(NSInteger)port
             withParams:(NSDictionary *)params
+      withCookieParams:(NSDictionary *)cookieParams
+         withNamespace:(NSString *)endpoint
+{
+    [self connectToHost:host onPort:port withParams:params withCookieParams:cookieParams withNamespace:endpoint withConnectionTimeout:defaultConnectionTimeout];
+}
+
+- (void) connectToHost:(NSString *)host
+                onPort:(NSInteger)port
+            withParams:(NSDictionary *)params
+         withNamespace:(NSString *)endpoint
+ withConnectionTimeout:(NSTimeInterval)connectionTimeout
+{
+    [self connectToHost:host onPort:port withParams:params withCookieParams:nil withNamespace:endpoint withConnectionTimeout:defaultConnectionTimeout];
+}
+
+- (void) connectToHost:(NSString *)host
+                onPort:(NSInteger)port
+            withParams:(NSDictionary *)params
+      withCookieParams:(NSDictionary *)cookieParams
          withNamespace:(NSString *)endpoint
  withConnectionTimeout:(NSTimeInterval)connectionTimeout
 {
@@ -144,9 +168,18 @@ NSString* const SocketIOException = @"SocketIOException";
         query = nil;
         
         // make a request
-        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:handshakeUrl]
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:handshakeUrl]
                                                  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData 
                                              timeoutInterval:connectionTimeout];
+        
+        if (cookieParams) {
+            NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieParams];
+            NSArray* cookieArray = [NSArray arrayWithObjects: cookie, nil];
+            NSDictionary * headers = [NSHTTPCookie requestHeaderFieldsWithCookies:cookieArray];
+            [request setAllHTTPHeaderFields:headers];
+        }
+        
+        [request setHTTPShouldHandleCookies:YES];
         
         _handshake = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
         [_handshake scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
