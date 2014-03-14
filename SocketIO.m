@@ -1,6 +1,6 @@
 //
 //  SocketIO.m
-//  v0.5 ARC
+//  v0.5.1
 //
 //  based on 
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
@@ -8,17 +8,14 @@
 //
 //  using
 //  https://github.com/square/SocketRocket
-//  https://github.com/stig/json-framework/
 //
 //  reusing some parts of
 //  /socket.io/socket.io.js
 //
 //  Created by Philipp Kyeck http://beta-interactive.de
 //
-//  Updated by 
-//    samlown   https://github.com/samlown
-//    kayleg    https://github.com/kayleg
-//    taiyangc  https://github.com/taiyangc
+//  With help from
+//    https://github.com/pkyeck/socket.IO-objc/blob/master/CONTRIBUTORS.md
 //
 
 #import "SocketIO.h"
@@ -78,7 +75,7 @@ NSString* const SocketIOException = @"SocketIOException";
 
 @synthesize isConnected = _isConnected, 
             isConnecting = _isConnecting, 
-            useSecure = _useSecure, 
+            useSecure = _useSecure,
             cookies = _cookies,
             delegate = _delegate,
             heartbeatTimeout = _heartbeatTimeout,
@@ -685,7 +682,7 @@ NSString* const SocketIOException = @"SocketIOException";
     NSLog(@"ERROR: handshake failed ... %@", [error localizedDescription]);
     
     int errorCode = [error code] == 403 ? SocketIOUnauthorized : SocketIOHandshakeFailed;
-
+    
     _isConnected = NO;
     _isConnecting = NO;
     
