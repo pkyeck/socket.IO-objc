@@ -124,9 +124,7 @@ see: [SocketRocket's Installing OS X](https://github.com/square/SocketRocket#ins
 ## Authors
 
 Initial project by Philipp Kyeck <http://beta-interactive.de>.  
-Namespace support by Sam Lown <sam@cabify.com> at Cabify.  
-SSL support by kayleg <https://github.com/kayleg>.  
-Different Socket Libraries + Error Handling by taiyangc <https://github.com/taiyangc>.  
+Additional support from these [amazing people](https://github.com/pkyeck/socket.IO-objc/blob/master/CONTRIBUTORS.md).
 
 ## License
 
