@@ -1,7 +1,14 @@
+## 0.5.1 (2014-03-14)
+
+  - add method to pass cookies on handshake
+  - distinguish between handshake failed and unauthorized handshake
+
+
 ## 0.5 (2014-02-21)
 
   - finally remove deprecated delegate methods
   - remove external JSON frameworks
+
 
 ## 0.4.1 (2013-11-18)
 
