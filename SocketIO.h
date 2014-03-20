@@ -111,10 +111,13 @@ typedef enum {
 
 - (void) sendMessage:(NSString *)data;
 - (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
+- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function withTimeout:(NSTimeInterval)timeout;
 - (void) sendJSON:(NSDictionary *)data;
 - (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function;
+- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function withTimeout:(NSTimeInterval)timeout;
 - (void) sendEvent:(NSString *)eventName withData:(id)data;
 - (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function;
+- (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function withTimeout:(NSTimeInterval)timeout;
 - (void) sendAcknowledgement:(NSString*)pId withArgs:(NSArray *)data;
 
 - (void) setResourceName:(NSString *)name;
