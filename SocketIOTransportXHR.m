@@ -171,6 +171,27 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
 
 - (void) connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
+    // check for server status code (http://gigliwood.com/weblog/Cocoa/Q__When_is_an_conne.html)
+    if ([response respondsToSelector:@selector(statusCode)]) {
+        NSInteger statusCode = [((NSHTTPURLResponse *)response) statusCode];
+        DEBUGLOG(@"didReceiveResponse() %i", statusCode);
+        
+        if (statusCode >= 400) {
+            // stop connecting; no more delegate messages
+            [connection cancel];
+            
+            NSString *error = [NSString stringWithFormat:NSLocalizedString(@"Server returned status code %d", @""), statusCode];
+            NSDictionary *errorInfo = [NSDictionary dictionaryWithObject:error forKey:NSLocalizedDescriptionKey];
+            NSError *statusError = [NSError errorWithDomain:SocketIOError
+                                                       code:statusCode
+                                                   userInfo:errorInfo];
+            
+            if ([delegate respondsToSelector:@selector(onError:)]) {
+                [delegate onError:statusError];
+            }
+        }
+    }
+    
     [_data setLength:0];
 }
 
