@@ -14,6 +14,22 @@ As of version 0.4, this library requires at least OS X 10.7 or iOS 5.0.
 Because of this, we were able to remove the external JSON frameworks in v0.5 and only rely on iOS' own `NSJSONSerialization`.
 
 
+###Framework (iOS)
+Now you can use the **SocketIO framework** (builded for iOS) without import all headers files.
+Just imports these libraries and frameworks:
+
+SocketIO.framework (it's under the product folder of this project) :)
+Security.framework
+SystemConfiguration.framework
+libicucore.dylib
+MobileCoreServices.framework
+CFNetwork.framework
+
+When you use the framework you must import the headers like below:
+
+    #import <SocketIO/SocketIO.h>
+
+    
 ## Usage
 
 The easiest way to connect to your Socket.IO / node.js server is
@@ -125,6 +141,8 @@ see: [SocketRocket's Installing OS X](https://github.com/square/SocketRocket#ins
 
 Initial project by Philipp Kyeck <http://beta-interactive.de>.  
 Additional support from these [amazing people](https://github.com/pkyeck/socket.IO-objc/blob/master/CONTRIBUTORS.md).
+
+Framework by g8production [www.g8production.com](http://www.g8production.com) [github](https://github.com/gali8)
 
 ## License
 
