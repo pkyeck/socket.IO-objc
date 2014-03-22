@@ -60,7 +60,6 @@
 		6463D36418DD1629006C6A78 /* SocketIOJSONSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */; };
 		6463D36518DD1629006C6A78 /* SocketIOTransportWebsocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AD96DF716808B7900D9E42D /* SocketIOTransportWebsocket.m */; };
 		6463D36618DD1629006C6A78 /* SocketIOTransportXHR.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AD96DFB16822DE300D9E42D /* SocketIOTransportXHR.m */; };
-		6463D37118DD180C006C6A78 /* SocketIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6463D37018DD180C006C6A78 /* SocketIO.framework */; };
 		C9E391A215E2A1B00004693A /* SocketIOJSONSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */; };
 /* End PBXBuildFile section */
 
@@ -104,7 +103,7 @@
 		6463D34B18DD1442006C6A78 /* SocketIO-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SocketIO-Info.plist"; sourceTree = "<group>"; };
 		6463D34D18DD1442006C6A78 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6463D34F18DD1442006C6A78 /* SocketIO-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SocketIO-Prefix.pch"; sourceTree = "<group>"; };
-		6463D37018DD180C006C6A78 /* SocketIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocketIO.framework; path = Products/SocketIO.framework; sourceTree = SOURCE_ROOT; };
+		6463D3A018DDF5D3006C6A78 /* SocketIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocketIO.framework; path = Products/SocketIO.framework; sourceTree = SOURCE_ROOT; };
 		C9E391A015E2A1B00004693A /* SocketIOJSONSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOJSONSerialization.h; sourceTree = SOURCE_ROOT; };
 		C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOJSONSerialization.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -120,7 +119,6 @@
 				4ADCCBA615790D760022990C /* CoreGraphics.framework in Frameworks */,
 				4ADCCBA415790D760022990C /* Foundation.framework in Frameworks */,
 				4ADCCBF115790FD30022990C /* MobileCoreServices.framework in Frameworks */,
-				6463D37118DD180C006C6A78 /* SocketIO.framework in Frameworks */,
 				4ADCCBF315790FDF0022990C /* SystemConfiguration.framework in Frameworks */,
 				4ADCCBA215790D760022990C /* UIKit.framework in Frameworks */,
 			);
@@ -188,7 +186,7 @@
 		4ADCCBA715790D760022990C /* SocketTesterARC */ = {
 			isa = PBXGroup;
 			children = (
-				6463D37018DD180C006C6A78 /* SocketIO.framework */,
+				6463D3A018DDF5D3006C6A78 /* SocketIO.framework */,
 				4A4453791589EE7D00B44ABB /* SocketRocket */,
 				4ADCCBB015790D760022990C /* AppDelegate.h */,
 				4ADCCBB115790D760022990C /* AppDelegate.m */,
