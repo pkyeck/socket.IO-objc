@@ -18,11 +18,11 @@ Because of this, we were able to remove the external JSON frameworks in v0.5 and
 Now you can use the **SocketIO framework** (builded for iOS) without import all headers files.
 Just imports these libraries and frameworks:
 
-SocketIO.framework (it's under the product folder of this project) :)
-Security.framework
-SystemConfiguration.framework
-libicucore.dylib
-MobileCoreServices.framework
+SocketIO.framework (it's under the product folder of this project) :)  
+Security.framework  
+SystemConfiguration.framework  
+libicucore.dylib  
+MobileCoreServices.framework  
 CFNetwork.framework
 
 When you use the framework you must import the headers like below:
