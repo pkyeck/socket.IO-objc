@@ -60,7 +60,6 @@
 		6463D36418DD1629006C6A78 /* SocketIOJSONSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */; };
 		6463D36518DD1629006C6A78 /* SocketIOTransportWebsocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AD96DF716808B7900D9E42D /* SocketIOTransportWebsocket.m */; };
 		6463D36618DD1629006C6A78 /* SocketIOTransportXHR.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AD96DFB16822DE300D9E42D /* SocketIOTransportXHR.m */; };
-		6463D37118DD180C006C6A78 /* SocketIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6463D37018DD180C006C6A78 /* SocketIO.framework */; };
 		C9E391A215E2A1B00004693A /* SocketIOJSONSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */; };
 /* End PBXBuildFile section */
 
@@ -120,7 +119,6 @@
 				4ADCCBA615790D760022990C /* CoreGraphics.framework in Frameworks */,
 				4ADCCBA415790D760022990C /* Foundation.framework in Frameworks */,
 				4ADCCBF115790FD30022990C /* MobileCoreServices.framework in Frameworks */,
-				6463D37118DD180C006C6A78 /* SocketIO.framework in Frameworks */,
 				4ADCCBF315790FDF0022990C /* SystemConfiguration.framework in Frameworks */,
 				4ADCCBA215790D760022990C /* UIKit.framework in Frameworks */,
 			);
