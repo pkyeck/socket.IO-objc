@@ -1,3 +1,8 @@
+## 0.5.2 (2014-03-23)
+
+  - check HTTP status code of NSURLConnection responses during xhr polling transport
+
+
 ## 0.5.1 (2014-03-14)
 
   - add method to pass cookies on handshake
