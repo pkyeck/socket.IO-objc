@@ -36,7 +36,6 @@
 #define DEBUGLOG(...)
 #endif
 
-static NSString* kResourceName = @"socket.io";
 static NSString* kHandshakeURL = @"%@://%@%@/%@/1/?t=%.0f%@";
 static NSString* kForceDisconnectURL = @"%@://%@%@/%@/1/xhr-polling/%@?disconnect";
 
@@ -136,7 +135,7 @@ NSString* const SocketIOException = @"SocketIOException";
         NSString *protocol = _useSecure ? @"https" : @"http";
         NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
         NSTimeInterval time = [[NSDate date] timeIntervalSince1970] * 1000;
-        NSString *handshakeUrl = [NSString stringWithFormat:kHandshakeURL, protocol, _host, port, kResourceName, time, query];
+        NSString *handshakeUrl = [NSString stringWithFormat:kHandshakeURL, protocol, _host, port, _resourceName, time, query];
         
         DEBUGLOG(@"Connecting to socket with URL: %@", handshakeUrl);
         query = nil;
@@ -183,7 +182,7 @@ NSString* const SocketIOException = @"SocketIOException";
 {
     NSString *protocol = [self useSecure] ? @"https" : @"http";
     NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
-    NSString *urlString = [NSString stringWithFormat:kForceDisconnectURL, protocol, _host, port, kResourceName, _sid];
+    NSString *urlString = [NSString stringWithFormat:kForceDisconnectURL, protocol, _host, port, _resourceName, _sid];
     NSURL *url = [NSURL URLWithString:urlString];
     DEBUGLOG(@"Force disconnect at: %@", urlString);
     
@@ -261,7 +260,7 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) setResourceName:(NSString *)name
 {
-    kResourceName = [name copy];
+    _resourceName = [name copy];
 }
 
 # pragma mark -
