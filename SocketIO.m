@@ -92,6 +92,7 @@ NSString* const SocketIOException = @"SocketIOException";
         _acks = [[NSMutableDictionary alloc] init];
         _returnAllDataFromAck = NO;
     }
+    return self;
 }
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate
