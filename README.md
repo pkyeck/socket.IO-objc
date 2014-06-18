@@ -1,5 +1,3 @@
----
-
 **The current version of this library does not yet support socket.io v1.0.  
 So if you want to use socket.io-objc, please fall back to v0.9.x.**
 
