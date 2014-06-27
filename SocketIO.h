@@ -21,6 +21,7 @@
 #import <Foundation/Foundation.h>
 
 #import "SocketIOTransport.h"
+#import "SocketIOPacket.h"
 
 @class SocketIO;
 @class SocketIOPacket;
@@ -39,6 +40,7 @@ typedef enum {
     SocketIODataCouldNotBeSend = -7,
     SocketIOUnauthorized = -8
 } SocketIOErrorCodes;
+
 
 
 @protocol SocketIODelegate <NSObject>
@@ -61,6 +63,8 @@ typedef enum {
     NSString *_endpoint;
     NSDictionary *_params;
     
+    SocketIOVersion _version;    
+    
     __weak id<SocketIODelegate> _delegate;
     
     NSObject <SocketIOTransport> *_transport;
@@ -75,7 +79,9 @@ typedef enum {
     
     // heartbeat
     NSTimeInterval _heartbeatTimeout;
+    NSTimeInterval _connectionTimeout;
     dispatch_source_t _timeout;
+    dispatch_source_t _heartbeat;
     
     NSMutableArray *_queue;
     

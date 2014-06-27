@@ -58,6 +58,12 @@ static NSString* kSecureXHRPortURL = @"https://%@:%d/socket.io/1/xhr-polling/%@"
 
 - (void) open
 {
+    [self openUsing:V09x];
+}
+
+
+- (void) openUsing:(SocketIOVersion)version
+{
     NSString *format;
     if (delegate.port) {
         format = delegate.useSecure ? kSecureXHRPortURL : kInsecureXHRPortURL;
