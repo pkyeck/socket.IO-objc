@@ -27,18 +27,12 @@
 
 - (id) init
 {
-    return [self init:V09x];
-}
-
-- (id) init:(SocketIOVersion) version
-{
     self = [super init];
     if (self)
     {
-        switch (version) {
-            case V09x:
-                _types = [NSArray arrayWithObjects: @"disconnect",
-                          @"connect",
+        _separator = @":";
+        _types = [NSArray arrayWithObjects: @"disconnect",
+                            @"connect",
                           @"heartbeat",
                           @"message",
                           @"json",
@@ -47,47 +41,13 @@
                           @"error",
                           @"noop",
                           nil];
-                _typesMessage = nil;
-                break;
-                
-            case V10x:
-            {
-                _types = [NSArray arrayWithObjects: @"disconnected",
-                          @"connected",
-                          @"heartbeat",
-                          @"pong",
-                          @"message",
-                          @"upgrade",
-                          @"noop",
-                          nil];
-                _typesMessage = [NSArray arrayWithObjects: @"connect",
-                          @"disconnect",
-                          @"event",
-                          @"ack",
-                          @"error",
-                          @"binarevent",
-                          @"binaryack",
-                          nil];
-            }   break;
-        }
     }
     return self;
 }
 
 - (id) initWithType:(NSString *)packetType
 {
-    return [self initWithType:packetType using:V09x];
-}
-
-- (id) initWithTypeIndex:(int)index
-{
-    return [self initWithTypeIndex:index using:V09x];
-}
-
-- (id) initWithType:(NSString *)packetType
-              using:(SocketIOVersion) version
-{
-    self = [self init:version];
+    self = [self init];
     if (self) {
         self.type = packetType;
     }
@@ -95,9 +55,8 @@
 }
 
 - (id) initWithTypeIndex:(int)index
-                   using:(SocketIOVersion) version
 {
-    self = [self init:version];
+    self = [self init];
     if (self) {
         self.type = [self typeForIndex:index];
     }
@@ -118,14 +77,7 @@
 
 - (NSString *) toString
 {
-    return [self toString:V09x];
-}
-
-- (NSString *) toString:(SocketIOVersion) version
-{
     NSMutableArray *encoded = [NSMutableArray arrayWithObject:[self typeAsNumber]];
-    //if([type isEqualToString:@"event"] && version == V10x)
-    //    [encoded addObject:@"2"];
     
     NSString *pIdL = self.pId != nil ? self.pId : @"";
     if ([self.ack isEqualToString:@"data"])
@@ -155,17 +107,89 @@
         {
             ackpId = [NSString stringWithFormat:@":%@%@", pIdL, @"+"];
         }
-        
-        if(version ==V10x)
-        {
-            
-        }
         [encoded addObject:[NSString stringWithFormat:@"%@%@", ackpId, data]];
     }
-    NSString *separator = @"";
-    if(version == V09x)
-        separator = @":";
-    return [encoded componentsJoinedByString:separator];
+    
+    return [encoded componentsJoinedByString:_separator];
+}
+
+- (NSNumber *) typeAsNumber
+{    
+    NSUInteger index = [_types indexOfObject:self.type];
+    NSNumber *num = [NSNumber numberWithUnsignedInteger:index];
+    return num;
+}
+
+- (NSString *) typeForIndex:(int)index
+{
+    return [_types objectAtIndex:index];
+}
+
++ (SocketIOPacket *) createPacketWithType:(NSString *)type
+                              version:(SocketIOVersion) version
+{
+    switch (version) {
+        case V09x:
+            return [[SocketIOPacket alloc] initWithType:type];
+            break;
+        case V10x:
+            return [[SocketIOPacketV10x alloc] initWithType:type];
+            break;
+    }
+}
+
++ (SocketIOPacket *) createPacketWithTypeIndex:(int) type
+                              version:(SocketIOVersion) version
+{
+    switch (version) {
+        case V09x:
+            return [[SocketIOPacket alloc] initWithTypeIndex:type];
+            break;
+        case V10x:
+            return [[SocketIOPacketV10x alloc] initWithTypeIndex:type];
+            break;
+    }
+}
+
+- (void) dealloc
+{
+    _types = nil;
+    
+    type = nil;
+    pId = nil;
+    name = nil;
+    ack = nil;
+    data = nil;
+    args = nil;
+    endpoint = nil;
+}
+
+@end
+
+@implementation SocketIOPacketV10x
+
+- (id) init
+{
+    self = [super init];
+    
+    _separator = @"";
+    _types = [NSArray arrayWithObjects: @"disconnected",
+              @"connected",
+              @"heartbeat",
+              @"pong",
+              @"message",
+              @"upgrade",
+              @"noop",
+              nil];
+    _typesMessage = [NSArray arrayWithObjects: @"connect",
+                     @"disconnect",
+                     @"event",
+                     @"ack",
+                     @"error",
+                     @"binarevent",
+                     @"binaryack",
+                     nil];
+    return self;
 }
 
 - (NSNumber *) typeAsNumber
@@ -181,21 +205,16 @@
     else
     {
         index = [_types indexOfObject:self.type];
-        num = [NSNumber numberWithUnsignedInteger:index];
     }
-    num = @([num integerValue] + [[NSNumber numberWithUnsignedInteger:index] integerValue]);    
+    num = @([num integerValue] + [[NSNumber numberWithUnsignedInteger:index] integerValue]);
     return num;
-}
-
-- (NSString *) typeForIndex:(int)index
-{
-    return [_types objectAtIndex:index];
 }
 
 - (void) dealloc
 {
-    _types = nil;
+    _typesMessage = nil;
     
+    _types = nil;
     type = nil;
     pId = nil;
     name = nil;

@@ -256,10 +256,11 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function
 {
-    SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"event" using:_version];
+    SocketIOPacket *packet ;
     switch (_version) {
         case V10x:
         {
+            packet = [[SocketIOPacketV10x alloc] initWithType:@"event"];
             NSMutableArray *array = [NSMutableArray arrayWithObjects:eventName, nil];
             
             // do not require arguments
@@ -273,6 +274,7 @@ NSString* const SocketIOException = @"SocketIOException";
             
         case V09x:
         {
+            packet = [[SocketIOPacket alloc] initWithType:@"event"];
             NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:eventName forKey:@"name"];
             
             // do not require arguments
@@ -312,20 +314,20 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) sendDisconnect
 {
-    SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"disconnect" using:_version];
+    SocketIOPacket *packet = [SocketIOPacket createPacketWithType:@"disconnect" version:_version];
     [self send:packet];
     [self onDisconnect:nil];
 }
 
 - (void) sendConnect
 {
-    SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"connect" using:_version];
+    SocketIOPacket *packet = [SocketIOPacket createPacketWithType:@"connect" version:_version];
     [self send:packet];
 }
 
 - (void) sendHeartbeat
 {
-    SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"heartbeat" using:_version];
+    SocketIOPacket *packet = [SocketIOPacket createPacketWithType:@"heartbeat" version:_version];
     [self send:packet];
 }
 
@@ -338,7 +340,7 @@ NSString* const SocketIOException = @"SocketIOException";
     DEBUGLOG(@"Prepare to send()");
     
     
-    NSString *req = [packet toString:_version];
+    NSString *req = [packet toString];
     if (![_transport isReady]) {
         DEBUGLOG(@"queue >>> %@", req);
         [_queue addObject:packet];
@@ -543,7 +545,7 @@ NSString* const SocketIOException = @"SocketIOException";
                 NSArray *result = [test objectAtIndex:0];
                 
                 int idx = [[result objectAtIndex:1] intValue];
-                SocketIOPacket *packet = [[SocketIOPacket alloc] initWithTypeIndex:idx using:_version];
+                SocketIOPacket *packet = [[SocketIOPacket alloc] initWithTypeIndex:idx];
                 
                 packet.pId = [result objectAtIndex:2];
                 
@@ -661,8 +663,7 @@ NSString* const SocketIOException = @"SocketIOException";
             //GET VERSION
             NSUInteger control = [[NSNumber numberWithUnsignedChar:[data characterAtIndex:0]] integerValue]
                                     -[[NSNumber numberWithUnsignedChar:'0'] integerValue];
-            SocketIOPacket *packet = [[SocketIOPacket alloc] initWithTypeIndex:control using:_version];
-            
+            SocketIOPacket *packet = [[SocketIOPacketV10x alloc] initWithTypeIndex:control];            
             
             //dont care about the endpoint here
             packet.endpoint = @"";
@@ -725,15 +726,36 @@ NSString* const SocketIOException = @"SocketIOException";
                             //Event
                             if([packet.data characterAtIndex:0] == '[' && [packet.data characterAtIndex:packet.data.length-1] == ']')
                             {
-                                NSString *prepArray = [packet.data substringWithRange:NSMakeRange(1, packet.data.length-2)];
-                                prepArray = [prepArray stringByReplacingOccurrencesOfString:@"\",\"" withString:@","]; //replace "," by ,
-                                prepArray = [prepArray stringByReplacingOccurrencesOfString:@"\\\"" withString:@"\""]; //replace \" by "
-                                prepArray = [prepArray substringWithRange:NSMakeRange(1, prepArray.length-2)];//remove first and last "
-                                DEBUGLOG(@"Parse this:%@ (%@)",packet.data,prepArray);
-                                NSArray *arrayResponse = [prepArray componentsSeparatedByString:@","];
+                                //We have data = ["<event>",DATA,DATA] (Data can be "BLABLA" or {"bla":"bla","to":"to"})
+                                NSString *prepData = [packet.data substringWithRange:NSMakeRange(1, packet.data.length-2)]; //remove first and last []
+                                //We have data = "<event>",DATA,DATA (Data can be "BLABLA" or {"bla":"bla","to":"to"})
+                                NSUInteger commalocation = [prepData rangeOfString:@"\"," ].location;
+                                NSString *eventName = [prepData substringWithRange:NSMakeRange(1, commalocation-1)];//we get the event
+                                prepData = [prepData substringWithRange:NSMakeRange(commalocation+2, prepData.length-commalocation-2)];
+                                NSUInteger from = 0,to,rootcount = 0;
+                                DEBUGLOG(@"Parse this:%@ (%@)",packet.data,prepData);
+                                NSMutableArray *arrayResponse = [[NSMutableArray alloc] init];
+                                for (to = 0;to<prepData.length;++to)
+                                {
+                                    unichar c = [prepData characterAtIndex:to];
+                                    if(c == '{')
+                                        ++rootcount;
+                                    else if(c == '}')
+                                        --rootcount;
+                                    else if(c == ','
+                                            && ([prepData characterAtIndex:to-1] == '\"' || [prepData characterAtIndex:to-1] == '}')
+                                            && ([prepData characterAtIndex:to+1] == '\"' || [prepData characterAtIndex:to+1] == '{')
+                                            && rootcount == 0)
+                                    {
+                                        //we can cut here
+                                        [arrayResponse addObject:[prepData substringWithRange:NSMakeRange(from,to-from)]];
+                                        from = to+1;
+                                    }
+                                }
+                                [arrayResponse addObject:[prepData substringWithRange:NSMakeRange(from,to-from)]];
                                 
-                                packet.name = arrayResponse[0];
-                                packet.args = [arrayResponse subarrayWithRange:NSMakeRange(1, arrayResponse.count-1)];
+                                packet.name = eventName;
+                                packet.args = arrayResponse;
                                 if([packet.name isEqualToString:@"message"])
                                 {
                                     packet.data = packet.args[0];
