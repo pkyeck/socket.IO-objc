@@ -726,36 +726,11 @@ NSString* const SocketIOException = @"SocketIOException";
                             //Event
                             if([packet.data characterAtIndex:0] == '[' && [packet.data characterAtIndex:packet.data.length-1] == ']')
                             {
-                                //We have data = ["<event>",DATA,DATA] (Data can be "BLABLA" or {"bla":"bla","to":"to"})
-                                NSString *prepData = [packet.data substringWithRange:NSMakeRange(1, packet.data.length-2)]; //remove first and last []
-                                //We have data = "<event>",DATA,DATA (Data can be "BLABLA" or {"bla":"bla","to":"to"})
-                                NSUInteger commalocation = [prepData rangeOfString:@"\"," ].location;
-                                NSString *eventName = [prepData substringWithRange:NSMakeRange(1, commalocation-1)];//we get the event
-                                prepData = [prepData substringWithRange:NSMakeRange(commalocation+2, prepData.length-commalocation-2)];
-                                NSUInteger from = 0,to,rootcount = 0;
-                                DEBUGLOG(@"Parse this:%@ (%@)",packet.data,prepData);
-                                NSMutableArray *arrayResponse = [[NSMutableArray alloc] init];
-                                for (to = 0;to<prepData.length;++to)
-                                {
-                                    unichar c = [prepData characterAtIndex:to];
-                                    if(c == '{')
-                                        ++rootcount;
-                                    else if(c == '}')
-                                        --rootcount;
-                                    else if(c == ','
-                                            && ([prepData characterAtIndex:to-1] == '\"' || [prepData characterAtIndex:to-1] == '}')
-                                            && ([prepData characterAtIndex:to+1] == '\"' || [prepData characterAtIndex:to+1] == '{')
-                                            && rootcount == 0)
-                                    {
-                                        //we can cut here
-                                        [arrayResponse addObject:[prepData substringWithRange:NSMakeRange(from,to-from)]];
-                                        from = to+1;
-                                    }
-                                }
-                                [arrayResponse addObject:[prepData substringWithRange:NSMakeRange(from,to-from)]];
-                                
-                                packet.name = eventName;
-                                packet.args = arrayResponse;
+                                NSData *utf8Data = [packet.data dataUsingEncoding:NSUTF8StringEncoding];
+                                NSArray *parsedData = [SocketIOJSONSerialization objectFromJSONData:utf8Data error:nil];
+                                DEBUGLOG(@"Event Type:%@",parsedData[0]);
+                                packet.name = parsedData[0];
+                                packet.args = [parsedData subarrayWithRange:NSMakeRange(1, parsedData.count-1)];
                                 if([packet.name isEqualToString:@"message"])
                                 {
                                     packet.data = packet.args[0];
@@ -771,9 +746,6 @@ NSString* const SocketIOException = @"SocketIOException";
                                 }
                                 
                             }
-                            
-                            
-                            
                         }    break;
                         case 3:
                             //Ack
