@@ -39,6 +39,8 @@
                   @"error",
                   @"noop",
                   nil];
+
+        self.endpoint = @"";
     }
     return self;
 }
