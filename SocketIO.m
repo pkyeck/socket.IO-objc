@@ -234,19 +234,20 @@ NSString* const SocketIOException = @"SocketIOException";
 - (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:eventName forKey:@"name"];
-
-    // do not require arguments
-    if (data != nil) {
-        [dict setObject:[NSArray arrayWithObject:data] forKey:@"args"];
-    }
+    @autoreleasepool {
+        // do not require arguments
+        if (data != nil) {
+            [dict setObject:[NSArray arrayWithObject:data] forKey:@"args"];
+        }
     
-    SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"event"];
-    packet.data = [SocketIOJSONSerialization JSONStringFromObject:dict error:nil];
-    packet.pId = [self addAcknowledge:function];
-    if (function) {
-        packet.ack = @"data";
+        SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"event"];
+        packet.data = [SocketIOJSONSerialization JSONStringFromObject:dict error:nil];
+        packet.pId = [self addAcknowledge:function];
+        if (function) {
+            packet.ack = @"data";
+        }
+        [self send:packet];
     }
-    [self send:packet];
 }
 
 - (void) sendAcknowledgement:(NSString *)pId withArgs:(NSArray *)data 
