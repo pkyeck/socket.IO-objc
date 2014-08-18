@@ -800,8 +800,14 @@ NSString* const SocketIOException = @"SocketIOException";
 #if defined(SOCKETIO_ENABLE_SSL_PINNING) && SOCKETIO_ENABLE_SSL_PINNING == 1
 - (void)connection:(NSURLConnection *)connection
 willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
-    RNPinnedCertValidator *validator = [[RNPinnedCertValidator alloc] initWithCertificatePath:[[NSBundle mainBundle] pathForResource:self.sslPinningCert ofType:@"cer"]];
-    [validator validateChallenge:challenge];
+    if (self.useSSLPinning) {
+        RNPinnedCertValidator *validator = [[RNPinnedCertValidator alloc] initWithCertificatePath:[[NSBundle mainBundle] pathForResource:self.sslPinningCert ofType:@"cer"]];
+        [validator validateChallenge:challenge];
+    } else {
+        // Just allow through any the certificate
+        NSURLCredential *credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
+        [[challenge sender] useCredential:credential forAuthenticationChallenge:challenge];
+    }
 }
 #endif
 
