@@ -22,6 +22,10 @@
 
 #import "SocketIOTransport.h"
 
+#if !defined(SOCKETIO_ENABLE_SSL_PINNING)
+#define SOCKETIO_ENABLE_SSL_PINNING 1
+#endif
+
 @class SocketIO;
 @class SocketIOPacket;
 
@@ -99,6 +103,10 @@ typedef enum {
 @property (nonatomic, readonly) BOOL isConnected, isConnecting;
 @property (nonatomic, weak) id<SocketIODelegate> delegate;
 @property (nonatomic) BOOL returnAllDataFromAck;
+
+@property (nonatomic) BOOL useSSLPinning;
+@property (nonatomic, strong) NSString *sslPinningCert;
+
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port;

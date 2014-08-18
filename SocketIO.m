@@ -22,6 +22,10 @@
 #import "SocketIOPacket.h"
 #import "SocketIOJSONSerialization.h"
 
+#if defined(SOCKETIO_ENABLE_SSL_PINNING) && SOCKETIO_ENABLE_SSL_PINNING == 1
+#import <RNPinnedCertValidator/RNPinnedCertValidator.h>
+#endif
+
 #ifdef DEBUG
 #define DEBUG_LOGS 1
 #define DEBUG_CERTIFICATE 1
@@ -792,6 +796,14 @@ NSString* const SocketIOException = @"SocketIOException";
     
     [_transport open];
 }
+
+#if defined(SOCKETIO_ENABLE_SSL_PINNING) && SOCKETIO_ENABLE_SSL_PINNING == 1
+- (void)connection:(NSURLConnection *)connection
+willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
+    RNPinnedCertValidator *validator = [[RNPinnedCertValidator alloc] initWithCertificatePath:[[NSBundle mainBundle] pathForResource:self.sslPinningCert ofType:@"cer"]];
+    [validator validateChallenge:challenge];
+}
+#endif
 
 #if DEBUG_CERTIFICATE
 
