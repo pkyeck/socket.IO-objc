@@ -64,7 +64,7 @@ static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@%@
     NSString *format;
     NSString *addOnVersion = @"";
     if(version == V10x)
-        addOnVersion = @"?EIO=2&transport=websocket&sid";
+        addOnVersion = @"?EIO=2&transport=websocket&sid=";
     
     if (delegate.port) {
         format = delegate.useSecure ? kSecureSocketPortURL : kInsecureSocketPortURL;
