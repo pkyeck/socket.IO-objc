@@ -663,6 +663,9 @@ NSString* const SocketIOException = @"SocketIOException";
             //GET VERSION
             NSUInteger control = [[NSNumber numberWithUnsignedChar:[data characterAtIndex:0]] integerValue]
                                     -[[NSNumber numberWithUnsignedChar:'0'] integerValue];
+            
+            NSUInteger ack = 0;
+            
             SocketIOPacket *packet = [[SocketIOPacketV10x alloc] initWithTypeIndex:control];            
             
             //dont care about the endpoint here
@@ -697,6 +700,10 @@ NSString* const SocketIOException = @"SocketIOException";
                     //Message
                     control = [[NSNumber numberWithUnsignedChar:[packet.data characterAtIndex:0]] integerValue]
                                                     -[[NSNumber numberWithUnsignedChar:'0'] integerValue];
+                    if([packet.data length] > 1){
+                        ack = [[NSNumber numberWithUnsignedChar:[packet.data characterAtIndex:1]] integerValue]
+                                                    -[[NSNumber numberWithUnsignedChar:'0'] integerValue];
+                    }
                     //GET ENDPOINT
                     NSUInteger rendpoint = [packet.data rangeOfString:@"["].location;
                     if(rendpoint == NSNotFound)
@@ -748,8 +755,33 @@ NSString* const SocketIOException = @"SocketIOException";
                             }
                         }    break;
                         case 3:
-                            //Ack
-                            break;
+                        {
+                            
+                            if (ack > 0) {
+                                int ackId = ack;
+                                DEBUGLOG(@"ack id found: %d", ackId);
+                                
+                                NSString *argsStr = [packet.data substringFromIndex:1 ];
+                                argsStr = [argsStr substringToIndex:argsStr.length-1];
+                                id argsData = nil;
+                                if (argsStr && ![argsStr isEqualToString:@""]) {
+                                    argsData = [SocketIOJSONSerialization objectFromJSONData:[argsStr dataUsingEncoding:NSUTF8StringEncoding] error:nil];
+                                    // either send complete response or only the first arg to callback
+//                                    if (!_returnAllDataFromAck && [argsData count] > 0) {
+//                                        argsData = [argsData objectAtIndex:0];
+//                                    }
+                                }
+                                
+                                // get selector for ackId
+                                NSString *key = [NSString stringWithFormat:@"%d", ackId];
+                                SocketIOCallback callbackFunction = [_acks objectForKey:key];
+                                if (callbackFunction != nil) {
+                                    callbackFunction(argsData);
+                                    [self removeAcknowledgeForKey:key];
+                                }
+                            }
+
+                        }    break;
                         case 4:
                             //Error
                             break;

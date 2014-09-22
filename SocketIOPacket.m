@@ -80,10 +80,13 @@
     NSMutableArray *encoded = [NSMutableArray arrayWithObject:[self typeAsNumber]];
     
     NSString *pIdL = self.pId != nil ? self.pId : @"";
-    if ([self.ack isEqualToString:@"data"])
-    {
-        pIdL = [pIdL stringByAppendingString:@"+"];
-    }
+
+// should be conditional to V09x
+//    if(SocketIO._version == V09x)
+//    if ([self.ack isEqualToString:@"data"])
+//    {
+//        pIdL = [pIdL stringByAppendingString:@"+"];
+//    }
     
     // Do not write pid for acknowledgements
     if ([type intValue] != 6) {
@@ -105,6 +108,7 @@
         // This is an acknowledgement packet, so, prepend the ack pid to the data
         if ([type intValue] == 6)
         {
+            // should be conditional to V09x
             ackpId = [NSString stringWithFormat:@":%@%@", pIdL, @"+"];
         }
         [encoded addObject:[NSString stringWithFormat:@"%@%@", ackpId, data]];
