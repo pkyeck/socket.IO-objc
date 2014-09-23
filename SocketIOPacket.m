@@ -20,6 +20,7 @@
 
 #import "SocketIOPacket.h"
 #import "SocketIOJSONSerialization.h"
+#import "SocketIO.h"
 
 @implementation SocketIOPacket
 
@@ -81,12 +82,13 @@
     
     NSString *pIdL = self.pId != nil ? self.pId : @"";
 
-// should be conditional to V09x
-//    if(SocketIO._version == V09x)
-//    if ([self.ack isEqualToString:@"data"])
-//    {
-//        pIdL = [pIdL stringByAppendingString:@"+"];
-//    }
+
+    if(SocketIO.version == V09x){
+        if ([self.ack isEqualToString:@"data"])
+        {
+            pIdL = [pIdL stringByAppendingString:@"+"];
+        }
+    }
     
     // Do not write pid for acknowledgements
     if ([type intValue] != 6) {
@@ -108,8 +110,8 @@
         // This is an acknowledgement packet, so, prepend the ack pid to the data
         if ([type intValue] == 6)
         {
-            // should be conditional to V09x
-            ackpId = [NSString stringWithFormat:@":%@%@", pIdL, @"+"];
+            if(SocketIO.version == V09x)
+                ackpId = [NSString stringWithFormat:@":%@%@", pIdL, @"+"];
         }
         [encoded addObject:[NSString stringWithFormat:@"%@%@", ackpId, data]];
     }
