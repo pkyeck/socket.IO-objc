@@ -92,6 +92,7 @@ typedef enum {
 
 @property (nonatomic, readonly) NSString *host;
 @property (nonatomic, readonly) NSInteger port;
+@property (nonatomic)           NSString *resource;
 @property (nonatomic, readonly) NSString *sid;
 @property (nonatomic, readonly) NSTimeInterval heartbeatTimeout;
 @property (nonatomic) BOOL useSecure;
@@ -117,7 +118,5 @@ typedef enum {
 - (void) sendEvent:(NSString *)eventName withData:(id)data;
 - (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function;
 - (void) sendAcknowledgement:(NSString*)pId withArgs:(NSArray *)data;
-
-- (void) setResourceName:(NSString *)name;
 
 @end
