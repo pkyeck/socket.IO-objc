@@ -128,8 +128,10 @@ NSString* const SocketIOException = @"SocketIOException";
         
         // create a query parameters string
         NSMutableString *query = [[NSMutableString alloc] initWithString:@""];
-        [params enumerateKeysAndObjectsUsingBlock: ^(id key, id value, BOOL *stop) {
-            [query appendFormat:@"&%@=%@", key, value];
+        [params enumerateKeysAndObjectsUsingBlock: ^(id key, id val, BOOL *stop) {
+            NSString *k = [key stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            NSString *v = [val stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            [query appendFormat:@"&%@=%@", k, v];
         }];
         
         // do handshake via HTTP request
@@ -151,9 +153,14 @@ NSString* const SocketIOException = @"SocketIOException";
             NSDictionary *headers = [NSHTTPCookie requestHeaderFieldsWithCookies:_cookies];
             [request setAllHTTPHeaderFields:headers];
         }
-        
         [request setHTTPShouldHandleCookies:YES];
-        
+
+        if (self.headers) {
+            [self.headers enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+                [request setValue:obj forHTTPHeaderField:key];
+            }];
+        }
+
         _handshake = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
         [_handshake scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
         [_handshake start];
