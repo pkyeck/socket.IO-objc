@@ -701,8 +701,9 @@ NSString* const SocketIOException = @"SocketIOException";
                     control = [[NSNumber numberWithUnsignedChar:[packet.data characterAtIndex:0]] integerValue]
                                                     -[[NSNumber numberWithUnsignedChar:'0'] integerValue];
                     if([packet.data length] > 1){
-                        ack = [[NSNumber numberWithUnsignedChar:[packet.data characterAtIndex:1]] integerValue]
-                                                    -[[NSNumber numberWithUnsignedChar:'0'] integerValue];
+                        NSRange range = NSMakeRange(1, [packet.data rangeOfString:@"["].location-1);
+                        NSString *ackStr = [packet.data substringWithRange:range];
+                        ack = [ackStr integerValue];
                     }
                     //GET ENDPOINT
                     NSUInteger rendpoint = [packet.data rangeOfString:@"["].location;
