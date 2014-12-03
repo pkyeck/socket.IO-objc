@@ -19,10 +19,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SocketIOTransport.h"
+
+@class SocketIOPacketV10x;
 
 @interface SocketIOPacket : NSObject
 {
     NSString *type;
+    NSString *_separator;
     NSString *pId;
     NSString *ack;
     NSString *name;
@@ -43,7 +47,22 @@
 - (id) initWithType:(NSString *)packetType;
 - (id) initWithTypeIndex:(int)index;
 - (id) dataAsJSON;
+- (NSString *) toString;
 - (NSNumber *) typeAsNumber;
 - (NSString *) typeForIndex:(int)index;
 
++ (SocketIOPacket *) createPacketWithType:(NSString *)type
+                              version:(SocketIOVersion) version;
++ (SocketIOPacket *) createPacketWithTypeIndex:(int) type
+                              version:(SocketIOVersion) version;
 @end
+
+@interface SocketIOPacketV10x : SocketIOPacket
+{    
+    NSArray *_typesMessage;
+}
+
+@end
+
+
+

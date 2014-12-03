@@ -1,5 +1,5 @@
-**The current version of this library does not yet support socket.io v1.0.  
-So if you want to use socket.io-objc, please fall back to v0.9.x.**
+**This fork supports some socket.io v1.0 features, (no binary support yet). Many thanks to francoisTemasys who did most of the heavy lifting; this is a fork of a fork. v0.9.x compatibility is generally maintained.
+
 
 There are other people working on an implemantation for Socket.io v1.x.x, you can take a look here:
 

@@ -26,7 +26,8 @@
     return [NSJSONSerialization JSONObjectWithData:data options:0 error:error];    
 }
 
-+ (NSString *) JSONStringFromObject:(id)object error:(NSError **)error {
++ (NSString *) JSONStringFromObject:(id)object error:(NSError **)error
+{
     NSData *data = [NSJSONSerialization dataWithJSONObject:object options:0 error:error];
     return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];    
 }
