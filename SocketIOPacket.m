@@ -21,6 +21,7 @@
 #import "SocketIOPacket.h"
 #import "SocketIOJSONSerialization.h"
 
+
 @implementation SocketIOPacket
 
 @synthesize type, pId, name, ack, data, args, endpoint;
@@ -80,9 +81,13 @@
     NSMutableArray *encoded = [NSMutableArray arrayWithObject:[self typeAsNumber]];
     
     NSString *pIdL = self.pId != nil ? self.pId : @"";
-    if ([self.ack isEqualToString:@"data"])
-    {
-        pIdL = [pIdL stringByAppendingString:@"+"];
+
+
+    if( !([self isKindOfClass:[SocketIOPacketV10x class]]) ){
+        if ([self.ack isEqualToString:@"data"])
+        {
+            pIdL = [pIdL stringByAppendingString:@"+"];
+        }
     }
     
     // Do not write pid for acknowledgements
@@ -105,7 +110,8 @@
         // This is an acknowledgement packet, so, prepend the ack pid to the data
         if ([type intValue] == 6)
         {
-            ackpId = [NSString stringWithFormat:@":%@%@", pIdL, @"+"];
+            if( !([self isKindOfClass:[SocketIOPacketV10x class]]) )
+                ackpId = [NSString stringWithFormat:@":%@%@", pIdL, @"+"];
         }
         [encoded addObject:[NSString stringWithFormat:@"%@%@", ackpId, data]];
     }
