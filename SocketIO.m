@@ -1009,7 +1009,8 @@ NSString* const SocketIOException = @"SocketIOException";
         DEBUGLOG(@"VERSION 10x");
         _version = V10x;
         //...0{"sid":"<sid>","upgrades":[<transports>,...],"pingInterval":<timeHeartbeat>,"pingTimeout":<timeOut>}
-        responseString = [responseString substringFromIndex:[responseString rangeOfString:@"{"].location];
+        if([responseString rangeOfString:@"{"].location != NSNotFound)
+            responseString = [responseString substringFromIndex:[responseString rangeOfString:@"{"].location];
         DEBUGLOG(@"Response %@", responseString);
         connectionFailed = true;
         NSData *utf8Data = [responseString dataUsingEncoding:NSUTF8StringEncoding];
