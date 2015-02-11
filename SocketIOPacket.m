@@ -78,7 +78,8 @@
 
 - (NSString *) toString
 {
-    NSMutableArray *encoded = [NSMutableArray arrayWithObject:[self typeAsNumber]];
+    NSNumber *typeAsNumber = [self typeAsNumber];
+    NSMutableArray *encoded = [NSMutableArray arrayWithObject:typeAsNumber];
     
     NSString *pIdL = self.pId != nil ? self.pId : @"";
 
@@ -87,6 +88,11 @@
         if ([self.ack isEqualToString:@"data"])
         {
             pIdL = [pIdL stringByAppendingString:@"+"];
+        }
+    } else {
+        // Engine.IO 1.0 expects payload with the ping packet
+        if ([typeAsNumber intValue] == 2) {
+            [encoded addObject:@"probe"];
         }
     }
     
