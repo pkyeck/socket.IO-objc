@@ -135,7 +135,7 @@ NSString* const SocketIOException = @"SocketIOException";
         
         // do handshake via HTTP request
         NSString *protocol = _useSecure ? @"https" : @"http";
-        NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
+        NSString *port = _port ? [NSString stringWithFormat:@":%ld", (long)_port] : @"";
         NSTimeInterval time = [[NSDate date] timeIntervalSince1970] * 1000;
         NSString *handshakeUrl = [NSString stringWithFormat:kHandshakeURL, protocol, _host, port, kResourceName,kTransportPolling, time, query];
         //@"%@://%@%@/%@/1/?t=%.0f%@";
@@ -185,7 +185,7 @@ NSString* const SocketIOException = @"SocketIOException";
 - (void) disconnectForced
 {
     NSString *protocol = [self useSecure] ? @"https" : @"http";
-    NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
+    NSString *port = _port ? [NSString stringWithFormat:@":%ld", (long)_port] : @"";
     NSString *urlString = [NSString stringWithFormat:kForceDisconnectURL, protocol, _host, port, kResourceName, _sid];
     NSURL *url = [NSURL URLWithString:urlString];
     DEBUGLOG(@"Force disconnect at: %@", urlString);
@@ -741,7 +741,8 @@ NSString* const SocketIOException = @"SocketIOException";
                                 packet.args = [parsedData subarrayWithRange:NSMakeRange(1, parsedData.count-1)];
                                 if([packet.name isEqualToString:@"message"])
                                 {
-                                    packet.data = packet.args[0];
+                                    // data is specified as NSString, so rewrap it...
+                                    packet.data = [SocketIOJSONSerialization JSONStringFromObject:packet.args[0] error:nil];
                                     if ([_delegate respondsToSelector:@selector(socketIO:didReceiveMessage:)]) {
                                         [_delegate socketIO:self didReceiveMessage:packet];
                                     }
