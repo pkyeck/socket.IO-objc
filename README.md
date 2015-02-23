@@ -1,4 +1,4 @@
-**This fork supports some socket.io v1.0 features, (no binary support yet). Many thanks to francoisTemasys who did most of the heavy lifting; this is a fork of a fork. v0.9.x compatibility is generally maintained.
+**This fork supports some socket.io v1.x features, (no binary support yet). Many thanks to francoisTemasys who did most of the heavy lifting; this is a fork of a fork. v0.9.x compatibility is generally maintained.
 
 
 ---
@@ -15,8 +15,7 @@
 
 ## Requirements
 
-As of version 0.4, this library requires at least OS X 10.7 or iOS 5.0.
-Because of this, we were able to remove the external JSON frameworks in v0.5 and only rely on iOS' own `NSJSONSerialization`.
+This library requires at least OS X 10.7 or iOS 5.0.
 
 
 ## Usage
