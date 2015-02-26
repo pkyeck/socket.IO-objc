@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		00DC61D01A9FC62100136DE1 /* socket.io-objc.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 00DC61CF1A9FC62100136DE1 /* socket.io-objc.podspec */; };
 		4A444FA11589E28800B44ABB /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A444FA01589E28800B44ABB /* libicucore.dylib */; };
 		4A444FA31589E29500B44ABB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A444FA21589E29500B44ABB /* Security.framework */; };
 		4A4453811589EE9100B44ABB /* base64.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A44537A1589EE9100B44ABB /* base64.c */; };
@@ -31,6 +32,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		00DC61CF1A9FC62100136DE1 /* socket.io-objc.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "socket.io-objc.podspec"; sourceTree = SOURCE_ROOT; };
 		4A444FA01589E28800B44ABB /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
 		4A444FA21589E29500B44ABB /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		4A44537A1589EE9100B44ABB /* base64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = base64.c; path = "submodules/socket-rocket/SocketRocket/base64.c"; sourceTree = SOURCE_ROOT; };
@@ -146,6 +148,7 @@
 				4ADCCBC615790DEC0022990C /* SocketIO.h */,
 				4ADCCBC715790DEC0022990C /* SocketIO.m */,
 				4AD96DF21680853E00D9E42D /* SocketIOPacket.h */,
+				00DC61CF1A9FC62100136DE1 /* socket.io-objc.podspec */,
 				4AD96DF31680853E00D9E42D /* SocketIOPacket.m */,
 				C9E391A015E2A1B00004693A /* SocketIOJSONSerialization.h */,
 				C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */,
@@ -221,6 +224,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00DC61D01A9FC62100136DE1 /* socket.io-objc.podspec in Resources */,
 				4ADCCBAC15790D760022990C /* InfoPlist.strings in Resources */,
 				4ADCCBB815790D760022990C /* ViewController.xib in Resources */,
 			);
