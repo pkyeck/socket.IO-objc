@@ -1,3 +1,5 @@
 .DS_Store
 build
 *xcuserdata*
+workspace.xml
+tasks.xml

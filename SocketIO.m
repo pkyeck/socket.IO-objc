@@ -129,7 +129,11 @@ NSString* const SocketIOException = @"SocketIOException";
         // create a query parameters string
         NSMutableString *query = [[NSMutableString alloc] initWithString:@""];
         [params enumerateKeysAndObjectsUsingBlock: ^(id key, id value, BOOL *stop) {
-            [query appendFormat:@"&%@=%@", key, value];
+            if ([value isKindOfClass:[NSString class]]) {
+                [query appendFormat:@"&%@=%@", key, [value stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+            } else {
+                [query appendFormat:@"&%@=%@", key, value];
+            }
         }];
         
         // do handshake via HTTP request
