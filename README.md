@@ -1,12 +1,8 @@
-**The current version of this library does not yet support socket.io v1.0.  
+**The current version of this library does not support socket.io v1.0.  
 So if you want to use socket.io-objc, please fall back to v0.9.x.**
 
-There are other people working on an implemantation for Socket.io v1.x.x, you can take a look here:
-
-   * [github.com/francoisp/socket.IO-objc](https://github.com/francoisp/socket.IO-objc)
-   * [github.com/MegaBits/SIOSocket](https://github.com/MegaBits/SIOSocket)
-
-I don't think they are there 100%, but further along than I am ...
+Today (15/03/09) the Socket.io guys [announced their own iOS library](http://socket.io/blog/socket-io-on-ios/) - grab it while it's still hot:  
+[github.com/socketio/socket.io-client-swift](https://github.com/socketio/socket.io-client-swift)
 
 ---
 
