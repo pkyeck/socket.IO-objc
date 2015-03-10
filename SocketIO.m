@@ -129,7 +129,25 @@ NSString* const SocketIOException = @"SocketIOException";
         // create a query parameters string
         NSMutableString *query = [[NSMutableString alloc] initWithString:@""];
         [params enumerateKeysAndObjectsUsingBlock: ^(id key, id value, BOOL *stop) {
-            [query appendFormat:@"&%@=%@", key, value];
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
+             NSCharacterSet *allowedCharacters = [[NSCharacterSet characterSetWithCharactersInString:@"!*'();:@&=+$,/?%#[]\" "] invertedSet];
+          
+             NSString *keyString   = [[NSString stringWithFormat:@"%@", key] stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacters];
+             NSString *valueString = [[NSString stringWithFormat:@"%@", value] stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacters];
+#else
+             NSString *keyString   = CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL,
+                                                                                            (__bridge CFStringRef) [NSString stringWithFormat:@"%@", key],
+                                                                                            NULL,
+                                                                                            CFSTR("!*'();:@&=+$,/?%#[]\" "),
+                                                                                            kCFStringEncodingUTF8));
+             NSString *valueString = CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL,
+                                                                                            (__bridge CFStringRef) [NSString stringWithFormat:@"%@", value],
+                                                                                            NULL,
+                                                                                            CFSTR("!*'();:@&=+$,/?%#[]\" "),
+                                                                                            kCFStringEncodingUTF8));
+#endif
+          
+             [query appendFormat:@"&%@=%@", keyString, valueString];
         }];
         
         // do handshake via HTTP request
