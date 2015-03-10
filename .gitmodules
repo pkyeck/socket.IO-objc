@@ -1,3 +1,6 @@
 [submodule "submodules/socket-rocket"]
 	path = submodules/socket-rocket
 	url = https://github.com/square/SocketRocket.git
+[submodule "submodules/RNPinnedCertValidator"]
+	path = submodules/RNPinnedCertValidator
+	url = https://github.com/rnapier/RNPinnedCertValidator.git
