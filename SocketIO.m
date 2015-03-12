@@ -41,6 +41,7 @@ static NSString* kHandshakeURL = @"%@://%@%@/%@/1/?t=%.0f%@";
 static NSString* kForceDisconnectURL = @"%@://%@%@/%@/1/xhr-polling/%@?disconnect";
 
 float const defaultConnectionTimeout = 10.0f;
+float const defaultReconnectTimeout = 10.0f;
 
 NSString* const SocketIOError     = @"SocketIOError";
 NSString* const SocketIOException = @"SocketIOException";
@@ -56,6 +57,7 @@ NSString* const SocketIOException = @"SocketIOException";
 - (void) onTimeout;
 
 - (void) onConnect:(SocketIOPacket *)packet;
+- (void) onReconnect;
 - (void) onDisconnect:(NSError *)error;
 
 - (void) sendDisconnect;
@@ -90,6 +92,7 @@ NSString* const SocketIOException = @"SocketIOException";
         _ackCount = 0;
         _acks = [[NSMutableDictionary alloc] init];
         _returnAllDataFromAck = NO;
+        _allowsReconnect = NO;
     }
     return self;
 }
@@ -380,6 +383,18 @@ NSString* const SocketIOException = @"SocketIOException";
     [self setTimeout];
 }
 
+- (void) onReconnect
+{
+    DEBUGLOG(@"onReconnect()");
+    if (_reconnectTimeout) {
+        dispatch_source_cancel(_reconnectTimeout);
+        _reconnectTimeout = NULL;
+    }
+    if ([_delegate respondsToSelector:@selector(socketIORequireReconnect:)]) {
+        [_delegate socketIORequireReconnect:self];
+    }
+}
+
 # pragma mark -
 # pragma mark Acknowledge methods
 
@@ -441,6 +456,33 @@ NSString* const SocketIOException = @"SocketIOException";
     
     dispatch_resume(_timeout);
     
+}
+
+- (void) setReconnectTimeout
+{
+    DEBUGLOG(@"start reconnect timeout");
+    if (_reconnectTimeout) {
+        dispatch_source_cancel(_reconnectTimeout);
+        _timeout = NULL;
+    }
+    
+    _reconnectTimeout = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,
+                                      0,
+                                      0,
+                                      dispatch_get_main_queue());
+    
+    dispatch_source_set_timer(_reconnectTimeout,
+                              dispatch_time(DISPATCH_TIME_NOW, defaultReconnectTimeout * NSEC_PER_SEC),
+                              0,
+                              0);
+    
+    __weak SocketIO *weakSelf = self;
+    
+    dispatch_source_set_event_handler(_reconnectTimeout, ^{
+        [weakSelf onReconnect];
+    });
+    
+    dispatch_resume(_reconnectTimeout);
 }
 
 
@@ -631,6 +673,10 @@ NSString* const SocketIOException = @"SocketIOException";
         [_transport close];
     }
     
+    if (_allowsReconnect) {
+        [self setReconnectTimeout];
+    }
+    
     if ((wasConnected || wasConnecting)) {
         if ([_delegate respondsToSelector:@selector(socketIODidDisconnect:disconnectedWithError:)]) {
             [_delegate socketIODidDisconnect:self disconnectedWithError:error];
@@ -685,6 +731,10 @@ NSString* const SocketIOException = @"SocketIOException";
     
     _isConnected = NO;
     _isConnecting = NO;
+    
+    if (_allowsReconnect) {
+        [self setReconnectTimeout];
+    }
     
     if ([_delegate respondsToSelector:@selector(socketIO:onError:)]) {
         NSMutableDictionary *errorInfo = [[NSDictionary dictionaryWithObject:error
