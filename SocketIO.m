@@ -36,7 +36,6 @@
 #define DEBUGLOG(...)
 #endif
 
-static NSString* kResourceName = @"socket.io";
 static NSString* kHandshakeURL = @"%@://%@%@/%@/1/?t=%.0f%@";
 static NSString* kForceDisconnectURL = @"%@://%@%@/%@/1/xhr-polling/%@?disconnect";
 
@@ -90,6 +89,7 @@ NSString* const SocketIOException = @"SocketIOException";
         _ackCount = 0;
         _acks = [[NSMutableDictionary alloc] init];
         _returnAllDataFromAck = NO;
+        self.resource = @"socket.io";
     }
     return self;
 }
@@ -128,15 +128,17 @@ NSString* const SocketIOException = @"SocketIOException";
         
         // create a query parameters string
         NSMutableString *query = [[NSMutableString alloc] initWithString:@""];
-        [params enumerateKeysAndObjectsUsingBlock: ^(id key, id value, BOOL *stop) {
-            [query appendFormat:@"&%@=%@", key, value];
+        [params enumerateKeysAndObjectsUsingBlock: ^(id key, id val, BOOL *stop) {
+            NSString *k = [key stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            NSString *v = [val stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            [query appendFormat:@"&%@=%@", k, v];
         }];
         
         // do handshake via HTTP request
         NSString *protocol = _useSecure ? @"https" : @"http";
-        NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
+        NSString *port = _port ? [NSString stringWithFormat:@":%ld", (long)_port] : @"";
         NSTimeInterval time = [[NSDate date] timeIntervalSince1970] * 1000;
-        NSString *handshakeUrl = [NSString stringWithFormat:kHandshakeURL, protocol, _host, port, kResourceName, time, query];
+        NSString *handshakeUrl = [NSString stringWithFormat:kHandshakeURL, protocol, _host, port, self.resource, time, query];
         
         DEBUGLOG(@"Connecting to socket with URL: %@", handshakeUrl);
         query = nil;
@@ -151,9 +153,14 @@ NSString* const SocketIOException = @"SocketIOException";
             NSDictionary *headers = [NSHTTPCookie requestHeaderFieldsWithCookies:_cookies];
             [request setAllHTTPHeaderFields:headers];
         }
-        
         [request setHTTPShouldHandleCookies:YES];
-        
+
+        if (self.headers) {
+            [self.headers enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+                [request setValue:obj forHTTPHeaderField:key];
+            }];
+        }
+
         _handshake = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
         [_handshake scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
         [_handshake start];
@@ -182,8 +189,8 @@ NSString* const SocketIOException = @"SocketIOException";
 - (void) disconnectForced
 {
     NSString *protocol = [self useSecure] ? @"https" : @"http";
-    NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
-    NSString *urlString = [NSString stringWithFormat:kForceDisconnectURL, protocol, _host, port, kResourceName, _sid];
+    NSString *port = _port ? [NSString stringWithFormat:@":%ld", (long)_port] : @"";
+    NSString *urlString = [NSString stringWithFormat:kForceDisconnectURL, protocol, _host, port, self.resource, _sid];
     NSURL *url = [NSURL URLWithString:urlString];
     DEBUGLOG(@"Force disconnect at: %@", urlString);
     
@@ -259,13 +266,7 @@ NSString* const SocketIOException = @"SocketIOException";
     [self send:packet];
 }
 
-- (void) setResourceName:(NSString *)name
-{
-    kResourceName = [name copy];
-}
-
-# pragma mark -
-# pragma mark private methods
+# pragma mark - private methods
 
 - (void) sendDisconnect
 {
@@ -653,7 +654,7 @@ NSString* const SocketIOException = @"SocketIOException";
     // check for server status code (http://gigliwood.com/weblog/Cocoa/Q__When_is_an_conne.html)
     if ([response respondsToSelector:@selector(statusCode)]) {
         NSInteger statusCode = [((NSHTTPURLResponse *)response) statusCode];
-        DEBUGLOG(@"didReceiveResponse() %i", statusCode);
+        DEBUGLOG(@"didReceiveResponse() %li", (long)statusCode);
         
         if (statusCode >= 400) {
             // stop connecting; no more delegate messages
