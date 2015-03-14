@@ -40,6 +40,25 @@ typedef enum {
     SocketIOUnauthorized = -8
 } SocketIOErrorCodes;
 
+@protocol SocketIOProtocol <NSObject>
+
+- (void) connectToHost:(NSString *)host onPort:(NSInteger)port;
+- (void) connectToHost:(NSString *)host
+                onPort:(NSInteger)port
+            withParams:(NSDictionary *)params;
+- (void) connectToHost:(NSString *)host
+                onPort:(NSInteger)port
+            withParams:(NSDictionary *)params
+ withConnectionTimeout: (NSTimeInterval) connectionTimeout;
+
+- (void) sendMessage:(NSString *)data;
+- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
+- (void) sendJSON:(NSDictionary *)data;
+- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function;
+- (void) sendEvent:(NSString *)eventName withData:(id)data;
+- (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function;
+
+@end
 
 @protocol SocketIODelegate <NSObject>
 @optional
@@ -52,13 +71,29 @@ typedef enum {
 - (void) socketIO:(SocketIO *)socket onError:(NSError *)error;
 @end
 
+@protocol SocketIONamespaceDelegate <NSObject>
 
-@interface SocketIO : NSObject <NSURLConnectionDelegate, SocketIOTransportDelegate>
+/// returns endpoint for namespace
+- (NSString *)endpoint;
+
+// Methods from SocketIODelegate protocol but mandatory
+- (void) socketIODidConnect:(SocketIO *)socket;
+- (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error;
+- (void) socketIO:(SocketIO *)socket didReceiveMessage:(SocketIOPacket *)packet;
+- (void) socketIO:(SocketIO *)socket didReceiveJSON:(SocketIOPacket *)packet;
+- (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet;
+- (void) socketIO:(SocketIO *)socket didSendMessage:(SocketIOPacket *)packet;
+- (void) socketIO:(SocketIO *)socket onError:(NSError *)error;
+
+@end
+
+
+@interface SocketIO : NSObject
+    <SocketIOProtocol, NSURLConnectionDelegate, SocketIOTransportDelegate>
 {
     NSString *_host;
     NSInteger _port;
     NSString *_sid;
-    NSString *_endpoint;
     NSDictionary *_params;
     
     __weak id<SocketIODelegate> _delegate;
@@ -100,11 +135,12 @@ typedef enum {
 @property (nonatomic, weak) id<SocketIODelegate> delegate;
 @property (nonatomic) BOOL returnAllDataFromAck;
 
+/// For single delegate i.e. when using a socketIO without namespace
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate;
+
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port;
 - (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params;
-- (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint;
-- (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withNamespace:(NSString *)endpoint withConnectionTimeout: (NSTimeInterval) connectionTimeout;
+- (void) connectToHost:(NSString *)host onPort:(NSInteger)port withParams:(NSDictionary *)params withConnectionTimeout: (NSTimeInterval) connectionTimeout;
 
 - (void) disconnect;
 - (void) disconnectForced;
