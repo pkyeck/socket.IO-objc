@@ -38,7 +38,7 @@
     NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:properties];
     NSArray *cookies = [NSArray arrayWithObjects:cookie, nil];
     
-    socketIO.cookies = cookies;
+   socketIO.cookies = cookies;
     
     // connect to the socket.io server that is running locally at port 3000
     [socketIO connectToHost:@"localhost" onPort:3000];
