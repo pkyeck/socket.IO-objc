@@ -81,15 +81,25 @@ NSString* const SocketIOException = @"SocketIOException";
             heartbeatTimeout = _heartbeatTimeout,
             returnAllDataFromAck = _returnAllDataFromAck;
 
+
+- (id) init
+{
+    self = [super init];
+    if (self) {
+        _delegate = nil;
+        _queue = [[NSMutableArray alloc] init];
+        _ackCount = 0;
+        _acks = [[NSMutableDictionary alloc] init];
+        _returnAllDataFromAck = NO;
+    }
+    return self;
+}
+
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate
 {
     self = [super init];
     if (self) {
         _delegate = delegate;
-        _queue = [[NSMutableArray alloc] init];
-        _ackCount = 0;
-        _acks = [[NSMutableDictionary alloc] init];
-        _returnAllDataFromAck = NO;
     }
     return self;
 }
