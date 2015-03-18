@@ -45,15 +45,15 @@
 @property (nonatomic, copy) NSArray *args;
 
 - (id) initWithType:(NSString *)packetType;
-- (id) initWithTypeIndex:(int)index;
+- (id) initWithTypeIndex:(NSUInteger)index;
 - (id) dataAsJSON;
 - (NSString *) toString;
 - (NSNumber *) typeAsNumber;
-- (NSString *) typeForIndex:(int)index;
+- (NSString *) typeForIndex:(NSUInteger)index;
 
 + (SocketIOPacket *) createPacketWithType:(NSString *)type
                               version:(SocketIOVersion) version;
-+ (SocketIOPacket *) createPacketWithTypeIndex:(int) type
++ (SocketIOPacket *) createPacketWithTypeIndex:(NSUInteger) type
                               version:(SocketIOVersion) version;
 @end
 
