@@ -55,7 +55,7 @@
     return self;
 }
 
-- (id) initWithTypeIndex:(int)index
+- (id) initWithTypeIndex:(NSUInteger)index
 {
     self = [self init];
     if (self) {
@@ -132,7 +132,7 @@
     return num;
 }
 
-- (NSString *) typeForIndex:(int)index
+- (NSString *) typeForIndex:(NSUInteger)index
 {
     return [_types objectAtIndex:index];
 }
@@ -150,7 +150,7 @@
     }
 }
 
-+ (SocketIOPacket *) createPacketWithTypeIndex:(int) type
++ (SocketIOPacket *) createPacketWithTypeIndex:(NSUInteger) type
                               version:(SocketIOVersion) version
 {
     switch (version) {

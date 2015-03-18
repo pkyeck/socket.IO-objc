@@ -760,8 +760,8 @@ NSString* const SocketIOException = @"SocketIOException";
                         {
                             
                             if (ack > 0) {
-                                int ackId = ack;
-                                DEBUGLOG(@"ack id found: %d", ackId);
+                                NSUInteger ackId = ack;
+                                DEBUGLOG(@"ack id found: %d", (unsigned int)ackId);
                                 
                                 NSString *argsStr = [packet.data substringFromIndex:1 ];
                                 argsStr = [argsStr substringToIndex:argsStr.length-1];
@@ -775,7 +775,7 @@ NSString* const SocketIOException = @"SocketIOException";
                                 }
                                 
                                 // get selector for ackId
-                                NSString *key = [NSString stringWithFormat:@"%d", ackId];
+                                NSString *key = [NSString stringWithFormat:@"%d", (unsigned int)ackId];
                                 SocketIOCallback callbackFunction = [_acks objectForKey:key];
                                 if (callbackFunction != nil) {
                                     callbackFunction(argsData);
@@ -865,7 +865,7 @@ NSString* const SocketIOException = @"SocketIOException";
     // check for server status code (http://gigliwood.com/weblog/Cocoa/Q__When_is_an_conne.html)
     if ([response respondsToSelector:@selector(statusCode)]) {
         NSInteger statusCode = [((NSHTTPURLResponse *)response) statusCode];
-        DEBUGLOG(@"didReceiveResponse() %i", statusCode);
+        DEBUGLOG(@"didReceiveResponse() %i", (int)statusCode);
         
         if (statusCode >= 400) {
             // stop connecting; no more delegate messages
