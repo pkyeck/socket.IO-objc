@@ -237,7 +237,10 @@ NSString* const SocketIOException = @"SocketIOException";
 
     // do not require arguments
     if (data != nil) {
-        [dict setObject:[NSArray arrayWithObject:data] forKey:@"args"];
+        if (![data isKindOfClass:[NSArray class]]) {
+            data = [NSArray arrayWithObject:data];
+        }
+        [dict setObject:data forKey:@"args"];
     }
     
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"event"];
