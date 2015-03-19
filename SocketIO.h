@@ -61,8 +61,6 @@ typedef enum {
     NSString *_endpoint;
     NSDictionary *_params;
     
-    __weak id<SocketIODelegate> _delegate;
-    
     NSObject <SocketIOTransport> *_transport;
     
     BOOL _isConnected;
