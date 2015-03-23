@@ -62,7 +62,7 @@ NSString* const SocketIOException = @"SocketIOException";
 - (void) sendHearbeat;
 - (void) send:(SocketIOPacket *)packet;
 
-- (NSString *) addAcknowledge:(SocketIOCallback)function;
+- (NSString *) addAcknowledge:(SocketIOCallback)function withTimeout:(NSTimeInterval)timeout;
 - (void) removeAcknowledgeForKey:(NSString *)key;
 - (NSMutableArray*) getMatchesFrom:(NSString*)data with:(NSString*)regex;
 
@@ -207,9 +207,14 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function
 {
+    [self sendMessage:data withAcknowledge:function withTimeout:0];
+}
+
+- (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function withTimeout:(NSTimeInterval)timeout
+{
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"message"];
     packet.data = data;
-    packet.pId = [self addAcknowledge:function];
+    packet.pId = [self addAcknowledge:function withTimeout:timeout];
     [self send:packet];
 }
 
@@ -220,9 +225,14 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function
 {
+    [self sendJSON:data withAcknowledge:function withTimeout:0];
+}
+
+- (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function withTimeout:(NSTimeInterval)timeout
+{
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"json"];
     packet.data = [SocketIOJSONSerialization JSONStringFromObject:data error:nil];
-    packet.pId = [self addAcknowledge:function];
+    packet.pId = [self addAcknowledge:function withTimeout:timeout];
     [self send:packet];
 }
 
@@ -233,6 +243,11 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function
 {
+    [self sendEvent:eventName withData:data andAcknowledge:function withTimeout:0];
+}
+
+- (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function withTimeout:(NSTimeInterval)timeout
+{
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:eventName forKey:@"name"];
 
     // do not require arguments
@@ -242,7 +257,7 @@ NSString* const SocketIOException = @"SocketIOException";
     
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"event"];
     packet.data = [SocketIOJSONSerialization JSONStringFromObject:dict error:nil];
-    packet.pId = [self addAcknowledge:function];
+    packet.pId = [self addAcknowledge:function withTimeout:timeout];
     if (function) {
         packet.ack = @"data";
     }
@@ -332,7 +347,10 @@ NSString* const SocketIOException = @"SocketIOException";
     else {
         DEBUGLOG(@"send() >>> %@", req);
         [_transport send:req];
-        
+        NSTimer *timoutTimer = _acks[packet.pId][@"timer"];
+        if (timoutTimer) {
+            [[NSRunLoop currentRunLoop] addTimer:timoutTimer forMode:NSRunLoopCommonModes];
+        }
         if ([_delegate respondsToSelector:@selector(socketIO:didSendMessage:)]) {
             [_delegate socketIO:self didSendMessage:packet];
         }
@@ -383,12 +401,20 @@ NSString* const SocketIOException = @"SocketIOException";
 # pragma mark -
 # pragma mark Acknowledge methods
 
-- (NSString *) addAcknowledge:(SocketIOCallback)function
+- (NSString *) addAcknowledge:(SocketIOCallback)function withTimeout:(NSTimeInterval)timeout;
 {
     if (function) {
         ++_ackCount;
         NSString *ac = [NSString stringWithFormat:@"%ld", (long)_ackCount];
-        [_acks setObject:[function copy] forKey:ac];
+        NSMutableDictionary *ack = [@{@"callback":[function copy]} mutableCopy];
+        if (timeout) {
+            ack[@"timer"] = [NSTimer timerWithTimeInterval:timeout
+                                                    target:self
+                                                  selector:@selector(acknowledgeTimeout:)
+                                                  userInfo:@{@"ac":ac}
+                                                   repeats:NO];
+        }
+        [_acks setObject:ack forKey:ac];
         return ac;
     }
     return nil;
@@ -397,6 +423,16 @@ NSString* const SocketIOException = @"SocketIOException";
 - (void) removeAcknowledgeForKey:(NSString *)key
 {
     [_acks removeObjectForKey:key];
+}
+
+- (void)acknowledgeTimeout:(NSTimer *)timer
+{
+    NSString *key = timer.userInfo[@"ac"];
+    SocketIOCallback callbackFunction = _acks[key][@"callback"];
+    if (callbackFunction) {
+        callbackFunction(nil);
+        [self removeAcknowledgeForKey:key];
+    }
 }
 
 # pragma mark -
@@ -576,8 +612,10 @@ NSString* const SocketIOException = @"SocketIOException";
                     
                     // get selector for ackId
                     NSString *key = [NSString stringWithFormat:@"%d", ackId];
-                    SocketIOCallback callbackFunction = [_acks objectForKey:key];
+                    NSDictionary *ack = [_acks objectForKey:key];
+                    SocketIOCallback callbackFunction = ack[@"callback"];
                     if (callbackFunction != nil) {
+                        [ack[@"timer"] invalidate];
                         callbackFunction(argsData);
                         [self removeAcknowledgeForKey:key];
                     }
