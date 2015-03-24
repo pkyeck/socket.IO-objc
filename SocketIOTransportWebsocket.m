@@ -29,10 +29,10 @@
 #define DEBUGLOG(...)
 #endif
 
-static NSString* kInsecureSocketURL = @"ws://%@/socket.io/1/websocket/%@%@";
-static NSString* kSecureSocketURL = @"wss://%@/socket.io/1/websocket/%@%@";
-static NSString* kInsecureSocketPortURL = @"ws://%@:%d/socket.io/1/websocket/%@%@";
-static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@%@";
+static NSString* kInsecureSocketURL = @"ws://%@/socket.io/1/websocket/%@";
+static NSString* kSecureSocketURL = @"wss://%@/socket.io/1/websocket/%@";
+static NSString* kInsecureSocketPortURL = @"ws://%@:%d/socket.io/1/websocket/%@";
+static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@";
 
 @implementation SocketIOTransportWebsocket
 
@@ -62,17 +62,17 @@ static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@%@
 {
     NSString *urlStr;
     NSString *format;
-    NSString *addOnVersion = @"";
+    NSString *addOnVersion = delegate.sid;;
     if(version == V10x)
-        addOnVersion = @"?EIO=2&transport=websocket&sid=";
+        addOnVersion = [NSString stringWithFormat:@"?EIO=2&transport=websocket&sid=%@", delegate.sid];
     
     if (delegate.port) {
         format = delegate.useSecure ? kSecureSocketPortURL : kInsecureSocketPortURL;
-        urlStr = [NSString stringWithFormat:format, delegate.host, delegate.port, addOnVersion, delegate.sid];
+        urlStr = [NSString stringWithFormat:format, delegate.host, delegate.port, addOnVersion, delegate.sid, addOnVersion];
     }
     else {
         format = delegate.useSecure ? kSecureSocketURL : kInsecureSocketURL;
-        urlStr = [NSString stringWithFormat:format, delegate.host,addOnVersion, delegate.sid];
+        urlStr = [NSString stringWithFormat:format, delegate.host,addOnVersion, delegate.sid, addOnVersion];
     }
     NSURL *url = [NSURL URLWithString:urlStr];
     
