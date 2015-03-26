@@ -20,6 +20,13 @@
 
 #import <Foundation/Foundation.h>
 
+typedef enum SocketIOVersion
+{
+    V09x,
+    V10x
+} SocketIOVersion;
+
+
 @protocol SocketIOTransportDelegate <NSObject>
 
 - (void) onData:(id)message;
@@ -38,6 +45,7 @@
 
 - (id) initWithDelegate:(id <SocketIOTransportDelegate>)delegate;
 - (void) open;
+- (void) openUsing:(SocketIOVersion)version;
 - (void) close;
 - (BOOL) isReady;
 - (void) send:(NSString *)request;

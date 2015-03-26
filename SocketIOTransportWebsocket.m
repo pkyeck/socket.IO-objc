@@ -54,15 +54,25 @@ static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@";
 
 - (void) open
 {
+    [self openUsing:V09x];
+}
+
+
+- (void) openUsing:(SocketIOVersion)version
+{
     NSString *urlStr;
     NSString *format;
+    NSString *addOnVersion = delegate.sid;;
+    if(version == V10x)
+        addOnVersion = [NSString stringWithFormat:@"?EIO=2&transport=websocket&sid=%@", delegate.sid];
+    
     if (delegate.port) {
         format = delegate.useSecure ? kSecureSocketPortURL : kInsecureSocketPortURL;
-        urlStr = [NSString stringWithFormat:format, delegate.host, delegate.port, delegate.sid];
+        urlStr = [NSString stringWithFormat:format, delegate.host, delegate.port, addOnVersion, delegate.sid, addOnVersion];
     }
     else {
         format = delegate.useSecure ? kSecureSocketURL : kInsecureSocketURL;
-        urlStr = [NSString stringWithFormat:format, delegate.host, delegate.sid];
+        urlStr = [NSString stringWithFormat:format, delegate.host,addOnVersion, delegate.sid, addOnVersion];
     }
     NSURL *url = [NSURL URLWithString:urlStr];
     
@@ -104,6 +114,7 @@ static NSString* kSecureSocketPortURL = @"wss://%@:%d/socket.io/1/websocket/%@";
 - (void) webSocketDidOpen:(SRWebSocket *)webSocket
 {
     DEBUGLOG(@"Socket opened.");
+    [_webSocket send:@"5"];
 }
 
 - (void) webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error
