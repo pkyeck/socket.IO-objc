@@ -28,6 +28,7 @@
 		4ADCCBF315790FDF0022990C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ADCCBF215790FDF0022990C /* SystemConfiguration.framework */; };
 		4ADCCD4D157915F00022990C /* SocketIO.m in Sources */ = {isa = PBXBuildFile; fileRef = 4ADCCBC715790DEC0022990C /* SocketIO.m */; };
 		C9E391A215E2A1B00004693A /* SocketIOJSONSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */; };
+		FA4408951849FDCC006FA1EA /* SocketIO+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = FA4408941849FDCC006FA1EA /* SocketIO+Blocks.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,6 +68,8 @@
 		4ADCCBF215790FDF0022990C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		C9E391A015E2A1B00004693A /* SocketIOJSONSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOJSONSerialization.h; sourceTree = SOURCE_ROOT; };
 		C9E391A115E2A1B00004693A /* SocketIOJSONSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOJSONSerialization.m; sourceTree = SOURCE_ROOT; };
+		FA4408931849FDCC006FA1EA /* SocketIO+Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SocketIO+Blocks.h"; sourceTree = "<group>"; };
+		FA4408941849FDCC006FA1EA /* SocketIO+Blocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SocketIO+Blocks.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +140,7 @@
 		4ADCCBA715790D760022990C /* SocketTesterARC */ = {
 			isa = PBXGroup;
 			children = (
+				FA4408921849FDC1006FA1EA /* SocketIOBlocks */,
 				4A4453791589EE7D00B44ABB /* SocketRocket */,
 				4ADCCBB015790D760022990C /* AppDelegate.h */,
 				4ADCCBB115790D760022990C /* AppDelegate.m */,
@@ -168,6 +172,15 @@
 				4ADCCBAF15790D760022990C /* SocketTesterARC-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		FA4408921849FDC1006FA1EA /* SocketIOBlocks */ = {
+			isa = PBXGroup;
+			children = (
+				FA4408931849FDCC006FA1EA /* SocketIO+Blocks.h */,
+				FA4408941849FDCC006FA1EA /* SocketIO+Blocks.m */,
+			);
+			path = SocketIOBlocks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -241,6 +254,7 @@
 				4A4453821589EE9100B44ABB /* NSData+SRB64Additions.m in Sources */,
 				4A4453831589EE9100B44ABB /* SRWebSocket.m in Sources */,
 				C9E391A215E2A1B00004693A /* SocketIOJSONSerialization.m in Sources */,
+				FA4408951849FDCC006FA1EA /* SocketIO+Blocks.m in Sources */,
 				4AD96DF41680853E00D9E42D /* SocketIOPacket.m in Sources */,
 				4AD96DF816808B7900D9E42D /* SocketIOTransportWebsocket.m in Sources */,
 				4AD96DFC16822DE300D9E42D /* SocketIOTransportXHR.m in Sources */,
