@@ -88,6 +88,8 @@ typedef enum {
     
     // get all arguments from ack? (https://github.com/pkyeck/socket.IO-objc/pull/85)
     BOOL _returnAllDataFromAck;
+    
+    BOOL _useSocket;
 }
 
 @property (nonatomic, readonly) NSString *host;
