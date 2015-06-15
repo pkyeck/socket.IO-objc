@@ -21,7 +21,7 @@ Today (15/03/09) the Socket.io guys [announced their own iOS library](http://soc
 As of version 0.4, this library requires at least OS X 10.7 or iOS 5.0.
 Because of this, we were able to remove the external JSON frameworks in v0.5 and only rely on iOS' own `NSJSONSerialization`.
 
-
+-Add "libicucore.dylib" under "Linked Frameworks and Libraries" in Xcode.
 ## Usage
 
 The easiest way to connect to your Socket.IO / node.js server is
