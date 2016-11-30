@@ -91,6 +91,7 @@ typedef enum {
 }
 
 @property (nonatomic, readonly) NSString *host;
+@property (nonatomic, readonly) NSString *resourceName;
 @property (nonatomic, readonly) NSInteger port;
 @property (nonatomic, readonly) NSString *sid;
 @property (nonatomic, readonly) NSTimeInterval heartbeatTimeout;

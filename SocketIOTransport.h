@@ -28,6 +28,7 @@
 
 @property (nonatomic, readonly) NSString *host;
 @property (nonatomic, readonly) NSInteger port;
+@property (nonatomic, readonly) NSString *resourceName;
 @property (nonatomic, readonly) NSString *sid;
 @property (nonatomic, readonly) NSTimeInterval heartbeatTimeout;
 @property (nonatomic) BOOL useSecure;
