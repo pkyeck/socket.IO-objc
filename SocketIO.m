@@ -404,10 +404,7 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) onTimeout 
 {
-    if (_timeout) {
-        dispatch_source_cancel(_timeout);
-        _timeout = NULL;
-    }
+    [ self cleanupHeartbeatTimeout ];
     
     DEBUGLOG(@"Timed out waiting for heartbeat.");
     [self onDisconnect:[NSError errorWithDomain:SocketIOError
@@ -418,10 +415,7 @@ NSString* const SocketIOException = @"SocketIOException";
 - (void) setTimeout 
 {
     DEBUGLOG(@"start/reset timeout");
-    if (_timeout) {
-        dispatch_source_cancel(_timeout);
-        _timeout = NULL;
-    }
+    [ self cleanupHeartbeatTimeout ];
     
     _timeout = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,
                                       0,
@@ -619,10 +613,7 @@ NSString* const SocketIOException = @"SocketIOException";
     [_queue removeAllObjects];
     
     // Kill the heartbeat timer
-    if (_timeout) {
-        dispatch_source_cancel(_timeout);
-        _timeout = NULL;
-    }
+    [ self cleanupHeartbeatTimeout ];
     
     // Disconnect the websocket, just in case
     if (_transport != nil) {
@@ -819,6 +810,15 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 }
 #endif
 
+# pragma mark - Cleanup Heartbeat Timer
+-(void) cleanupHeartbeatTimeout
+{
+    if (_timeout) {
+        dispatch_source_cancel(_timeout);
+        dispatch_release(_timeout);
+        _timeout = NULL;
+    }
+}
 
 # pragma mark -
 
@@ -833,11 +833,8 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
     
     _transport.delegate = nil;
     _transport = nil;
-    
-    if (_timeout) {
-        dispatch_source_cancel(_timeout);
-        _timeout = NULL;
-    }
+   
+    [ self cleanupHeartbeatTimeout ];
     
     _queue = nil;
     _acks = nil;
